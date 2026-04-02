@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISU Fans Quiz Hub</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f5f5f5;min-height:100vh;}
+.hub{font-family:'DM Sans',sans-serif;max-width:680px;margin:0 auto;padding:0 16px 2rem;}
+.profile-screen{min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem;}
+.profile-grid{display:flex;flex-direction:column;gap:8px;width:100%;max-width:340px;margin-bottom:1.5rem;}
+.profile-card{display:flex;align-items:center;gap:12px;padding:12px 14px;background:white;border:0.5px solid #ddd;border-radius:12px;cursor:pointer;transition:all 0.15s;}
+.profile-card:hover{border-color:#aaa;background:#f9f9f9;}
+.profile-card.selected{border-color:#4fc3f7;border-width:1.5px;}
+.profile-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;flex-shrink:0;}
+.profile-name{font-size:14px;font-weight:500;color:#111;}
+.profile-meta{font-size:12px;color:#888;}
+.profile-delete{margin-left:auto;font-size:18px;opacity:0.3;cursor:pointer;padding:4px;}
+.profile-delete:hover{opacity:0.8;}
+.new-profile-row{display:flex;gap:8px;width:100%;max-width:340px;}
+.new-profile-row input{flex:1;padding:10px 14px;border:0.5px solid #ddd;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:white;color:#111;outline:none;}
+.new-profile-row input:focus{border-color:#4fc3f7;}
+.btn{padding:10px 18px;border:none;background:#0d2137;color:white;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.15s;}
+.btn:hover{opacity:0.85;}
+.btn-sm{padding:6px 14px;font-size:11px;}
+.hub-header{padding:1.5rem 0 1rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.hub-logo{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:#111;letter-spacing:-0.5px;}
+.hub-logo span{color:#4fc3f7;}
+.user-chip{display:flex;align-items:center;gap:8px;background:#f0f0f0;border:0.5px solid #ddd;border-radius:20px;padding:5px 12px 5px 6px;cursor:pointer;margin-left:auto;}
+.user-chip:hover{border-color:#aaa;}
+.score-bar{background:#f0f0f0;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:500;color:#111;border:0.5px solid #ddd;}
+.score-bar b{color:#4fc3f7;font-family:'Space Mono',monospace;}
+.tabs{display:flex;gap:3px;background:#f0f0f0;padding:4px;border-radius:12px;border:0.5px solid #ddd;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:1;min-width:44px;padding:7px 5px;border:none;background:transparent;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;color:#888;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.tab.active{background:white;color:#111;border:0.5px solid #ccc;}
+.panel{display:none;}.panel.active{display:block;}
+.q-card{background:white;border:0.5px solid #ddd;border-radius:12px;padding:1.5rem;margin-bottom:1rem;}
+.q-label{font-size:11px;font-weight:500;letter-spacing:0.08em;color:#888;text-transform:uppercase;margin-bottom:0.5rem;}
+.q-value{font-family:'Space Mono',monospace;font-size:32px;font-weight:700;color:#111;margin-bottom:0.25rem;}
+.q-sub{font-size:13px;color:#888;}
+.q-disc{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;margin-top:6px;}
+.disc-singles{background:#e3f2fd;color:#0277bd;}.disc-pairs{background:#fce4ec;color:#c2185b;}
+.disc-dance{background:#f3e5f5;color:#7b1fa2;}.disc-junior{background:#fff8e1;color:#f57f17;}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.choice-btn{padding:12px;border:0.5px solid #ddd;background:white;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:#111;cursor:pointer;transition:all 0.15s;text-align:left;line-height:1.35;}
+.choice-btn:hover{background:#f5f5f5;border-color:#aaa;}
+.choice-btn.correct{background:#e8f5e9;border-color:#66bb6a;color:#2e7d32;}
+.choice-btn.wrong{background:#ffebee;border-color:#ef5350;color:#c62828;}
+.streak-pill{display:inline-flex;align-items:center;gap:6px;background:#f0f0f0;border:0.5px solid #ddd;border-radius:20px;padding:5px 12px;font-size:12px;color:#888;margin-bottom:1rem;}
+.streak-pill b{color:#f9a825;font-family:'Space Mono',monospace;}
+.text-input-row{display:flex;gap:8px;margin-top:1rem;}
+.text-input-row input{flex:1;padding:10px 14px;border:0.5px solid #ddd;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;background:white;color:#111;outline:none;}
+.text-input-row input:focus{border-color:#4fc3f7;}
+.text-input-row button{padding:10px 18px;border:none;background:#0d2137;color:white;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;}
+.timer-display{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;}
+.time-ring{position:relative;width:56px;height:56px;}
+.time-ring svg{position:absolute;top:0;left:0;transform:rotate(-90deg);}
+.time-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:#111;}
+.timer-stats{flex:1;}
+.timer-stats .big{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:#111;}
+.timer-stats .lbl{font-size:12px;color:#888;}
+.hint-card{background:#f5f5f5;border-radius:10px;padding:1rem;margin-bottom:1rem;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.hint-item{font-size:13px;color:#888;}
+.hint-item b{color:#111;font-weight:500;}
+.wordle-history{margin-top:1rem;display:flex;flex-direction:column;gap:6px;}
+.wordle-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:13px;font-family:'Space Mono',monospace;}
+.wordle-row.correct{background:#e8f5e9;color:#2e7d32;}.wordle-row.wrong{background:#ffebee;color:#c62828;}
+.result-msg{font-size:13px;color:#888;padding:10px 14px;border-radius:8px;background:#f5f5f5;margin-top:0.75rem;display:none;}
+.tf-statement{font-size:17px;font-weight:500;color:#111;line-height:1.5;margin-bottom:1.5rem;}
+.tf-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tf-btn{padding:18px 12px;border:0.5px solid #ddd;background:white;border-radius:12px;font-family:'Space Mono',monospace;font-size:18px;font-weight:700;cursor:pointer;transition:all 0.15s;text-align:center;}
+.tf-btn:hover{background:#f5f5f5;}
+.tf-btn.true-btn{color:#2e7d32;}.tf-btn.false-btn{color:#c62828;}
+.tf-btn.correct{background:#e8f5e9;border-color:#66bb6a;}.tf-btn.wrong{background:#ffebee;border-color:#ef5350;}
+.tf-explanation{font-size:13px;line-height:1.5;padding:12px 14px;border-radius:8px;background:#f5f5f5;color:#888;margin-top:1rem;display:none;}
+.tf-progress{display:flex;gap:4px;margin-bottom:1rem;flex-wrap:wrap;}
+.tf-dot{width:10px;height:10px;border-radius:50%;background:#ddd;}
+.tf-dot.c{background:#66bb6a;}.tf-dot.w{background:#ef5350;}
+.tf-lives{display:flex;gap:6px;align-items:center;}
+.tf-life{font-size:16px;}
+.cat-pill{display:inline-block;font-size:10px;font-weight:600;letter-spacing:0.06em;padding:2px 8px;border-radius:4px;margin-bottom:0.75rem;}
+.cat-pb{background:#e8eaf6;color:#283593;}.cat-wr{background:#fff8e1;color:#f57f17;}
+.cat-country{background:#e8f5e9;color:#1b5e20;}.cat-disc{background:#f3e5f5;color:#7b1fa2;}
+.cat-rules{background:#e3f2fd;color:#0277bd;}.cat-compare{background:#fce4ec;color:#880e4f;}
+.flash{position:fixed;top:20%;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:28px;font-weight:700;pointer-events:none;animation:flashUp 0.7s ease forwards;z-index:999;}
+@keyframes flashUp{0%{opacity:0;transform:translateX(-50%) translateY(10px) scale(0.8);}30%{opacity:1;transform:translateX(-50%) translateY(-5px) scale(1.1);}70%{opacity:1;transform:translateX(-50%) translateY(-10px) scale(1);}100%{opacity:0;transform:translateX(-50%) translateY(-30px) scale(0.9);}}
+.mode-badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:0.06em;padding:3px 8px;border-radius:4px;background:#f0f0f0;color:#888;border:0.5px solid #ddd;margin-bottom:1rem;}
+.mode-badge.hard-mode{background:#fff3e0;color:#e65100;border-color:#ffb74d;}
+.mode-badge.timer-mode{background:#e3f2fd;color:#0277bd;border-color:#64b5f6;}
+.mode-badge.wordle-mode{background:#f3e5f5;color:#6a1b9a;border-color:#ce93d8;}
+.mode-badge.country-mode{background:#e8f5e9;color:#1b5e20;border-color:#81c784;}
+.mode-badge.tf-mode{background:#fce4ec;color:#880e4f;border-color:#f48fb1;}
+.hl-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+.hl-card{background:white;border:0.5px solid #ddd;border-radius:12px;padding:1rem;text-align:center;}
+.hl-card.correct{border-color:#66bb6a;background:#e8f5e9;}
+.hl-card.wrong{border-color:#ef5350;background:#ffebee;}
+.hl-name{font-size:13px;font-weight:500;color:#111;margin-bottom:6px;line-height:1.3;}
+.hl-score{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:#111;}
+.hl-score.hidden{color:#ddd;}
+.hl-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.hl-btn{padding:14px;border:0.5px solid #ddd;background:white;border-radius:10px;font-family:'Space Mono',monospace;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.15s;text-align:center;}
+.hl-btn:hover{background:#f5f5f5;}
+.hl-btn.higher{color:#1b5e20;}.hl-btn.lower{color:#c62828;}
+.hl-btn.correct{background:#e8f5e9;border-color:#66bb6a;}
+.hl-btn.wrong{background:#ffebee;border-color:#ef5350;}
+.podium-skaters{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
+.podium-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:white;border:0.5px solid #ddd;border-radius:10px;cursor:grab;user-select:none;transition:all 0.15s;}
+.podium-item:active{cursor:grabbing;opacity:0.8;}
+.podium-item.dragging{opacity:0.4;}
+.podium-item.drag-over{border-color:#4fc3f7;background:#f0f9ff;}
+.podium-item.correct{border-color:#66bb6a;background:#e8f5e9;}
+.podium-item.wrong{border-color:#ef5350;background:#ffebee;}
+.podium-pos{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;width:28px;text-align:center;color:#888;}
+.podium-name{font-size:13px;font-weight:500;color:#111;flex:1;line-height:1.3;}
+.podium-score{font-family:'Space Mono',monospace;font-size:13px;color:#888;}
+.missing-display{font-family:'Space Mono',monospace;font-size:36px;font-weight:700;color:#111;letter-spacing:2px;margin:1rem 0;text-align:center;}
+.missing-display .blank{color:#4fc3f7;text-decoration:underline;}
+.digit-grid{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:1rem 0;}
+.digit-btn{width:44px;height:44px;border:0.5px solid #ddd;background:white;border-radius:8px;font-family:'Space Mono',monospace;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.15s;color:#111;}
+.digit-btn:hover{background:#f5f5f5;}
+.digit-btn.correct{background:#e8f5e9;border-color:#66bb6a;color:#2e7d32;}
+.digit-btn.wrong{background:#ffebee;border-color:#ef5350;color:#c62828;}
+.speed-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.speed-counter{font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:#111;}
+.speed-q{font-size:16px;font-weight:500;color:#111;line-height:1.5;margin-bottom:1.25rem;min-height:52px;}
+.speed-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.speed-result{font-size:13px;padding:8px 12px;border-radius:8px;margin-top:0.75rem;display:none;}
+.speed-result.ok{background:#e8f5e9;color:#2e7d32;}
+.speed-result.bad{background:#ffebee;color:#c62828;}
+.online-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#888;}
+.online-dot{width:7px;height:7px;border-radius:50%;background:#66bb6a;animation:pulse 2s infinite;}
+.online-dot.offline{background:#ef5350;animation:none;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.lb-loading{font-size:13px;color:#888;padding:1rem 0;text-align:center;}
+.lb-tabs{display:flex;gap:3px;background:#f0f0f0;padding:3px;border-radius:10px;border:0.5px solid #ddd;margin-bottom:1rem;overflow-x:auto;scrollbar-width:none;}
+.lb-tabs::-webkit-scrollbar{display:none;}
+.lb-tab{flex-shrink:0;padding:6px 10px;border:none;background:transparent;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;color:#888;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.lb-tab.active{background:white;color:#111;border:0.5px solid #ccc;}
+.lb-list{display:flex;flex-direction:column;gap:6px;}
+.lb-row{display:flex;align-items:center;gap:10px;padding:11px 1rem;background:white;border:0.5px solid #ddd;border-radius:10px;}
+.lb-rank{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;width:24px;color:#888;}
+.lb-rank.gold{color:#f9a825;}.lb-rank.silver{color:#78909c;}.lb-rank.bronze{color:#8d6e63;}
+.lb-score{margin-left:auto;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#111;}
+.lb-score-label{font-size:10px;color:#888;font-family:'DM Sans',sans-serif;margin-left:2px;}
+</style>
+</head>
+<body>
+ 
+<div id="profileScreen">
+  <div class="hub">
+    <div class="profile-screen">
+      <div style="font-family:'Space Mono',monospace;font-size:28px;font-weight:700;color:#111;margin-bottom:4px;">ISU<span style="color:#4fc3f7">⛸</span>Quiz</div>
+      <p style="font-size:14px;color:#888;margin-bottom:1.5rem;">Choose a profile or create a new one</p>
+      <div class="profile-grid" id="profileGrid"></div>
+      <div class="new-profile-row">
+        <input id="newProfileInput" placeholder="New username..." maxlength="20" onkeydown="if(event.key==='Enter')createProfile()">
+        <button class="btn" onclick="createProfile()">Create</button>
+      </div>
+      <div style="font-size:12px;color:#ef5350;margin-top:10px;min-height:18px;" id="profileError"></div>
+    </div>
+  </div>
+</div>
+ 
+<div id="mainApp" style="display:none">
+  <div class="hub">
+    <div class="hub-header">
+      <div><div class="hub-logo">ISU<span>⛸</span>Quiz</div></div>
+      <div class="score-bar">streak <b id="globalStreakDisplay">0</b></div>
+      <div class="user-chip" onclick="showProfileScreen()">
+        <div id="headerAvatar" style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;flex-shrink:0;"></div>
+        <span style="font-size:12px;font-weight:500;color:#111;margin-left:4px;" id="headerName"></span>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('easy',this)">Easy</button>
+      <button class="tab" onclick="switchTab('hard',this)">Hard</button>
+      <button class="tab" onclick="switchTab('country',this)">Country</button>
+      <button class="tab" onclick="switchTab('timer',this)">Timer</button>
+      <button class="tab" onclick="switchTab('wordle',this)">Wordle</button>
+      <button class="tab" onclick="switchTab('tf',this)">T/F</button>
+      <button class="tab" onclick="switchTab('hl',this)">Hi/Lo</button>
+      <button class="tab" onclick="switchTab('podium',this)">Podium</button>
+      <button class="tab" onclick="switchTab('missing',this)">Missing</button>
+      <button class="tab" onclick="switchTab('speed',this)">Speed</button>
+      <button class="tab" onclick="switchTab('leader',this)">Board</button>
+    </div>
+ 
+    <div id="easy" class="panel active">
+      <div class="mode-badge">Identify the skater by their personal best score</div>
+      <div class="streak-pill">Streak <b id="eStreak">0</b></div>
+      <div class="q-card"><div class="q-label">Personal Best Score</div><div class="q-value" id="eScore">—</div><div class="q-sub" id="eSub"></div><div id="eDisc"></div></div>
+      <div class="choices" id="eChoices"></div>
+    </div>
+    <div id="hard" class="panel">
+      <div class="mode-badge hard-mode">Type the answer · +2 pts per correct</div>
+      <div class="streak-pill">Score <b id="hStreakDisplay">0</b></div>
+      <div class="q-card"><div class="q-label">Personal Best Score</div><div class="q-value" id="hScore">—</div><div class="q-sub" id="hSub"></div></div>
+      <div class="text-input-row"><input id="hInput" placeholder="Skater name..." onkeydown="if(event.key==='Enter')checkHard()"><button onclick="checkHard()">Submit</button></div>
+      <div class="result-msg" id="hMsg"></div>
+    </div>
+    <div id="country" class="panel">
+      <div class="mode-badge country-mode">Match the skater to their country</div>
+      <div class="streak-pill">Streak <b id="cStreak">0</b></div>
+      <div class="q-card"><div class="q-label">Skater</div><div class="q-value" style="font-size:18px;margin-top:4px;line-height:1.3" id="cName">—</div><div class="q-sub" id="cSub"></div><div id="cDisc"></div></div>
+      <div class="choices" id="cChoices"></div>
+    </div>
+    <div id="timer" class="panel">
+      <div class="mode-badge timer-mode">30 seconds · wrong = -2s</div>
+      <div class="timer-display">
+        <div class="time-ring"><svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="none" stroke="#eee" stroke-width="3"/><circle cx="28" cy="28" r="24" fill="none" stroke="#4fc3f7" stroke-width="3" stroke-dasharray="150.8" id="timerArc" stroke-dashoffset="0" stroke-linecap="round"/></svg><div class="time-ring-num" id="tTimeSec">30</div></div>
+        <div class="timer-stats"><div class="big" id="tScoreDisplay">0</div><div class="lbl">correct</div></div>
+        <button class="btn" onclick="startTimer()">Start</button>
+      </div>
+      <div class="q-card" id="tCard" style="display:none"><div class="q-label">Personal Best Score</div><div class="q-value" id="tScore">—</div><div class="q-sub" id="tSub"></div></div>
+      <div class="choices" id="tChoices"></div>
+    </div>
+    <div id="wordle" class="panel">
+      <div class="mode-badge wordle-mode">Guess the skater · up to 6 tries</div>
+      <div class="hint-card" id="wHints"></div>
+      <div style="margin-bottom:0.75rem;font-size:13px;color:#888" id="wAttempts">Attempt 0 / 6</div>
+      <div class="text-input-row"><input id="wInput" placeholder="Skater name..." onkeydown="if(event.key==='Enter')checkWordle()"><button onclick="checkWordle()">Guess</button></div>
+      <div class="wordle-history" id="wHistory"></div>
+    </div>
+    <div id="tf" class="panel">
+      <div class="mode-badge tf-mode">3 lives · true or false</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <div class="streak-pill" style="margin-bottom:0">Score <b id="tfScore">0</b></div>
+        <div class="tf-lives" id="tfLives"></div>
+      </div>
+      <div class="tf-progress" id="tfProgress"></div>
+      <div class="q-card">
+        <div id="tfCatPill"></div>
+        <div class="tf-statement" id="tfStatement">Loading…</div>
+        <div class="tf-btns"><button class="tf-btn true-btn" id="tfTrue" onclick="answerTF(true)">TRUE</button><button class="tf-btn false-btn" id="tfFalse" onclick="answerTF(false)">FALSE</button></div>
+        <div class="tf-explanation" id="tfExplanation"></div>
+      </div>
+    </div>
+    <div id="hl" class="panel">
+      <div class="mode-badge" style="background:#e8f5e9;color:#1b5e20;border-color:#a5d6a7;">Is the next skater's PB higher or lower?</div>
+      <div class="streak-pill">Streak <b id="hlStreak">0</b></div>
+      <div class="hl-cards">
+        <div class="hl-card" id="hlLeft"><div class="hl-name" id="hlLeftName">—</div><div style="font-size:12px;color:#888;margin-bottom:6px" id="hlLeftDisc"></div><div class="hl-score" id="hlLeftScore">—</div></div>
+        <div class="hl-card" id="hlRight"><div class="hl-name" id="hlRightName">—</div><div style="font-size:12px;color:#888;margin-bottom:6px" id="hlRightDisc"></div><div class="hl-score hidden" id="hlRightScore">???</div></div>
+      </div>
+      <div class="hl-btns"><button class="hl-btn higher" id="hlHigherBtn" onclick="answerHL('higher')">▲ Higher</button><button class="hl-btn lower" id="hlLowerBtn" onclick="answerHL('lower')">▼ Lower</button></div>
+      <div class="result-msg" id="hlMsg"></div>
+    </div>
+    <div id="podium" class="panel">
+      <div class="mode-badge" style="background:#fff8e1;color:#e65100;border-color:#ffe082;">Drag to rank these 3 skaters by PB (1st = highest)</div>
+      <div class="streak-pill">Score <b id="podiumScore">0</b></div>
+      <div class="podium-skaters" id="podiumList"></div>
+      <button class="btn" id="podiumSubmit" onclick="checkPodium()">Submit order</button>
+      <div class="result-msg" id="podiumMsg"></div>
+    </div>
+    <div id="missing" class="panel">
+      <div class="mode-badge" style="background:#e8eaf6;color:#283593;border-color:#9fa8da;">Fill in the missing digit of the skater's PB</div>
+      <div class="streak-pill">Streak <b id="missingStreak">0</b></div>
+      <div class="q-card"><div class="q-label">Skater</div><div class="q-value" style="font-size:20px;margin-bottom:0.5rem" id="missingName">—</div><div class="q-sub" id="missingSub"></div><div class="missing-display" id="missingDisplay">—</div></div>
+      <div class="digit-grid" id="digitGrid"></div>
+      <div class="result-msg" id="missingMsg"></div>
+    </div>
+    <div id="speed" class="panel">
+      <div class="mode-badge" style="background:#fce4ec;color:#880e4f;border-color:#f48fb1;">Answer fast · 3 wrong ends the game</div>
+      <div class="speed-header">
+        <div><div class="speed-counter" id="speedScore">0</div><div style="font-size:12px;color:#888">correct answers</div></div>
+        <div style="text-align:right"><div style="font-family:'Space Mono',monospace;font-size:13px;color:#888" id="speedWrong">0 wrong</div><button class="btn btn-sm" style="margin-top:6px" onclick="startSpeed()">New game</button></div>
+      </div>
+      <div class="q-card"><div class="q-label" id="speedLabel">Question</div><div class="speed-q" id="speedQ">Press New game to start</div><div class="speed-choices" id="speedChoices"></div><div class="speed-result" id="speedResult"></div></div>
+    </div>
+    <div id="leader" class="panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <div class="online-badge"><span class="online-dot" id="lbDot"></span> <span id="lbStatus">Global leaderboard</span></div>
+        <button class="btn btn-sm" onclick="fetchLB()">Refresh</button>
+      </div>
+      <div class="lb-tabs">
+        <button class="lb-tab active" onclick="showLBSection('all',this)">All</button>
+        <button class="lb-tab" onclick="showLBSection('Streak',this)">🔥 Streak</button>
+        <button class="lb-tab" onclick="showLBSection('Easy',this)">Easy</button>
+        <button class="lb-tab" onclick="showLBSection('Hard',this)">Hard</button>
+        <button class="lb-tab" onclick="showLBSection('Country',this)">Country</button>
+        <button class="lb-tab" onclick="showLBSection('Timer',this)">Timer</button>
+        <button class="lb-tab" onclick="showLBSection('True/False',this)">T/F</button>
+        <button class="lb-tab" onclick="showLBSection('Higher/Lower',this)">Hi/Lo</button>
+        <button class="lb-tab" onclick="showLBSection('Podium',this)">Podium</button>
+        <button class="lb-tab" onclick="showLBSection('Missing Score',this)">Missing</button>
+        <button class="lb-tab" onclick="showLBSection('Speed Round',this)">Speed</button>
+      </div>
+      <div class="lb-list" id="lbList"><div class="lb-loading">Loading…</div></div>
+    </div>
+  </div>
+</div>
+ 
+<script>
+// ── CREDENTIALS ───────────────────────────────────────────────────────────────
+const BIN_ID  = '69cea45faaba882197bba65b';
+const API_KEY = '$2a$10$25hRvSa9yLuYxUo9Z/6RQOSgFpkHKcz/6KCq.rZ61nF2rpLJKvJ36';
+const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+ 
+// ── ONLINE LEADERBOARD ────────────────────────────────────────────────────────
+let onlineLB = [], currentLBSection = 'all';
+ 
+function setLBOnline(online) {
+  const dot = document.getElementById('lbDot');
+  const txt = document.getElementById('lbStatus');
+  if (online) { dot.className = 'online-dot'; txt.textContent = 'Global leaderboard'; }
+  else { dot.className = 'online-dot offline'; txt.textContent = 'Offline — scores saved locally'; }
+}
+ 
+async function fetchLB() {
+  document.getElementById('lbList').innerHTML = '<div class="lb-loading">Loading…</div>';
+  try {
+    const r = await fetch(BIN_URL + '/latest', { headers: { 'X-Master-Key': API_KEY, 'X-Bin-Meta': 'false' } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    onlineLB = Array.isArray(data) ? data : [];
+    setLBOnline(true);
+    renderLBSection(currentLBSection);
+  } catch (e) {
+    setLBOnline(false);
+    document.getElementById('lbList').innerHTML = '<div class="lb-loading">Could not reach leaderboard server.</div>';
+  }
+}
+ 
+async function pushScore(entry) {
+  onlineLB.push(entry);
+  onlineLB.sort((a, b) => b.score - a.score);
+  onlineLB = onlineLB.slice(0, 200);
+  try {
+    const r = await fetch(BIN_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY }, body: JSON.stringify(onlineLB) });
+    if (r.ok) setLBOnline(true);
+  } catch (e) { setLBOnline(false); }
+}
+ 
+function showLBSection(section, el) {
+  currentLBSection = section;
+  document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderLBSection(section);
+}
+ 
+function renderLBSection(section) {
+  const el = document.getElementById('lbList');
+  let filtered;
+  if (section === 'all') {
+    const best = {};
+    onlineLB.filter(e => e.mode !== 'Streak').forEach(e => { if (!best[e.user] || e.score > best[e.user].score) best[e.user] = e; });
+    filtered = Object.values(best).sort((a, b) => b.score - a.score);
+  } else {
+    const best = {};
+    onlineLB.filter(e => e.mode === section).forEach(e => { if (!best[e.user] || e.score > best[e.user].score) best[e.user] = e; });
+    filtered = Object.values(best).sort((a, b) => b.score - a.score);
+  }
+  if (!filtered.length) { el.innerHTML = '<p style="color:#888;font-size:14px;padding:1rem 0">No scores yet for this mode!</p>'; return; }
+  const medals = ['#1', '#2', '#3'], cls = ['gold', 'silver', 'bronze'];
+  el.innerHTML = filtered.slice(0, 20).map((x, i) => {
+    const [bg, fg] = avatarColors(x.user); const isMe = x.user === currentProfile;
+    const label = section === 'Streak' ? 'streak' : (section === 'all' ? x.mode : 'pts');
+    return `<div class="lb-row" style="${isMe ? 'border-color:#4fc3f7;border-width:1.5px;' : ''}">
+      <div class="lb-rank ${cls[i] || ''}">${medals[i] || '#' + (i + 1)}</div>
+      <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;flex-shrink:0;background:${bg};color:${fg}">${initials(x.user)}</div>
+      <div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:500;color:#111">${x.user}${isMe ? ' <span style="font-size:10px;color:#4fc3f7">you</span>' : ''}</div><div style="font-size:11px;color:#888">${section === 'all' ? x.mode : x.date}</div></div>
+      <div style="display:flex;align-items:baseline;gap:3px"><div class="lb-score">${x.score}</div><div class="lb-score-label">${label}</div></div>
+    </div>`;
+  }).join('');
+}
+ 
+// ── PROFILES ──────────────────────────────────────────────────────────────────
+const AVATAR_COLORS = [['#e3f2fd','#0277bd'],['#fce4ec','#c2185b'],['#e8f5e9','#1b5e20'],['#fff8e1','#f57f17'],['#f3e5f5','#7b1fa2'],['#e8eaf6','#283593'],['#fbe9e7','#bf360c'],['#e0f7fa','#006064']];
+function avatarColors(name) { let h = 0; for (let c of name) h = (h * 31 + c.charCodeAt(0)) % AVATAR_COLORS.length; return AVATAR_COLORS[h]; }
+function initials(n) { return n.slice(0, 2).toUpperCase(); }
+const STORE_KEY = 'isuProfiles_v2';
+let currentProfile = null;
+function loadProfiles() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch (e) { return []; } }
+function saveProfiles(p) { try { localStorage.setItem(STORE_KEY, JSON.stringify(p)); } catch (e) { } }
+function createProfile() {
+  const input = document.getElementById('newProfileInput'), name = input.value.trim(), err = document.getElementById('profileError');
+  if (!name || name.length < 2) { err.textContent = 'Username must be at least 2 characters.'; return; }
+  const profiles = loadProfiles();
+  if (profiles.find(p => p.name.toLowerCase() === name.toLowerCase())) { err.textContent = 'That username is taken on this device.'; return; }
+  profiles.push({ name, created: Date.now() }); saveProfiles(profiles); input.value = ''; err.textContent = ''; renderProfileGrid(); loginAs(name);
+}
+function deleteProfile(name, e) {
+  e.stopPropagation(); if (!confirm('Delete "' + name + '" from this device?')) return;
+  saveProfiles(loadProfiles().filter(p => p.name !== name)); renderProfileGrid();
+}
+function loginAs(name) {
+  currentProfile = name;
+  document.getElementById('profileScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  const [bg, fg] = avatarColors(name);
+  const av = document.getElementById('headerAvatar');
+  av.style.cssText = `background:${bg};color:${fg};width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;flex-shrink:0;`;
+  av.textContent = initials(name);
+  document.getElementById('headerName').textContent = name;
+  resetAllGames(); fetchLB();
+}
+function showProfileScreen() { document.getElementById('mainApp').style.display = 'none'; document.getElementById('profileScreen').style.display = 'block'; renderProfileGrid(); }
+function renderProfileGrid() {
+  const profiles = loadProfiles(), grid = document.getElementById('profileGrid');
+  if (!profiles.length) { grid.innerHTML = '<p style="font-size:13px;color:#888;text-align:center">No profiles yet</p>'; return; }
+  grid.innerHTML = '';
+  profiles.forEach(p => {
+    const [bg, fg] = avatarColors(p.name);
+    const top = onlineLB.filter(e => e.user === p.name && e.mode !== 'Streak').reduce((m, e) => Math.max(m, e.score), 0);
+    const bestStreak = onlineLB.filter(e => e.user === p.name && e.mode === 'Streak').reduce((m, e) => Math.max(m, e.score), 0);
+    const card = document.createElement('div'); card.className = 'profile-card' + (currentProfile === p.name ? ' selected' : ''); card.onclick = () => loginAs(p.name);
+    card.innerHTML = `<div class="profile-avatar" style="background:${bg};color:${fg}">${initials(p.name)}</div><div><div class="profile-name">${p.name}</div><div class="profile-meta">${top > 0 ? 'Best: ' + top + ' pts' : 'No scores yet'}${bestStreak > 0 ? ' · 🔥' + bestStreak : ''}</div></div><div class="profile-delete" onclick="deleteProfile('${p.name.replace(/'/g, "\\'")}',event)">×</div>`;
+    grid.appendChild(card);
+  });
+}
+function saveScore(score, mode) { if (score <= 0 || !currentProfile) return; pushScore({ user: currentProfile, score, mode, date: new Date().toLocaleDateString() }); }
+function saveStreak(streak) {
+  if (streak <= 0 || !currentProfile) return;
+  const existing = onlineLB.filter(e => e.user === currentProfile && e.mode === 'Streak').reduce((m, e) => Math.max(m, e.score), 0);
+  if (streak > existing) pushScore({ user: currentProfile, score: streak, mode: 'Streak', date: new Date().toLocaleDateString() });
+}
+ 
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+const DISCS = { S: 'Singles', SJ: 'Jr. Singles', P: 'Pairs', D: 'Ice Dance' };
+const DISC_CLS = { S: 'disc-singles', SJ: 'disc-junior', P: 'disc-pairs', D: 'disc-dance' };
+function discBadge(d) { return `<span class="q-disc ${DISC_CLS[d]}">${DISCS[d] || d}</span>`; }
+const allSkaters = [
+  ["Ilia Malinin",333.81,"USA","S"],["Yuma Kagiyama",306.67,"Japan","S"],["Shun Sato",292.08,"Japan","S"],
+  ["Mikhail Shaidorov",291.58,"Kazakhstan","S"],["Daniel Grassl",288.72,"Italy","S"],["Stephen Gogolev",281.04,"Canada","S"],
+  ["Adam Siao Him Fa",280.95,"France","S"],["Junhwan Cha",273.92,"Korea","S"],["Kao Miura",273.73,"Japan","S"],
+  ["Nika Egadze",273.00,"Georgia","S"],["Petr Gumennik",271.21,"Russia","S"],["Aleksandr Selevko",270.42,"Estonia","S"],
+  ["Sota Yamamoto",270.07,"Japan","S"],["Kevin Aymoz",269.13,"France","S"],["Kazuki Tomono",268.60,"Japan","S"],
+  ["Nikolaj Memola",265.37,"Italy","S"],["Andrew Torgashev",259.06,"USA","S"],["Boyang Jin",258.86,"China","S"],
+  ["Jason Brown",257.81,"USA","S"],["Matteo Rizzo",256.37,"Italy","S"],["Lukas Britschgi",251.90,"Switzerland","S"],
+  ["Tomoki Hiwatashi",245.71,"USA","S"],["Roman Sadovsky",243.29,"Canada","S"],["Kaori Sakamoto",238.28,"Japan","S"],
+  ["Mone Chiba",228.47,"Japan","S"],["Alysa Liu",226.79,"USA","S"],["Yuna Aoki",217.39,"Japan","S"],
+  ["Niina Petrokina",216.14,"Estonia","S"],["Amber Glenn",214.91,"USA","S"],["Isabeau Levito",212.71,"USA","S"],
+  ["Haein Lee",210.56,"Korea","S"],["Loena Hendrickx",204.96,"Belgium","S"],["Bradie Tennell",199.37,"USA","S"],
+  ["Young You",198.82,"Korea","S"],["Starr Andrews",195.28,"USA","S"],
+  ["Mao Shimada",218.13,"Japan","SJ"],["Rio Nakata",268.47,"Japan","SJ"],["Minkyu Seo",255.91,"Korea","SJ"],
+  ["Taiga Nishino",241.23,"Japan","SJ"],["Hana Bath",205.39,"Australia","SJ"],["Mei Okada",195.82,"Japan","SJ"],
+  ["Wenjing Sui / Cong Han",234.84,"China","P"],["Alexa Knierim / Brandon Frazier",222.17,"USA","P"],
+  ["Anastasia Mishina / Aleksandr Galliamov",220.44,"Russia","P"],["Riku Miura / Ryuichi Kihara",217.89,"Japan","P"],
+  ["Xiaoyu Chen / Hao Yang",215.72,"China","P"],["Deanna Stellato-Dudek / Maxime Deschamps",214.50,"Canada","P"],
+  ["Evgenia Tarasova / Vladimir Morozov",225.50,"Russia","P"],["Cheng Peng / Yang Jin",219.38,"China","P"],
+  ["Annika Hocke / Robert Kunkel",205.14,"Germany","P"],["Minerva Hase / Nolan Seegert",208.77,"Germany","P"],
+  ["Madison Chock / Evan Bates",222.17,"USA","D"],["Gabriella Papadakis / Guillaume Cizeron",229.82,"France","D"],
+  ["Victoria Sinitsina / Nikita Katsalapov",220.51,"Russia","D"],["Charlene Guignard / Marco Fabbri",218.74,"Italy","D"],
+  ["Piper Gilles / Paul Poirier",215.36,"Canada","D"],["Lilah Fear / Lewis Gibson",212.88,"Great Britain","D"],
+  ["Laurence Fournier Beaudry / Nikolaj Soerensen",212.20,"Canada","D"],["Marjorie Lajoie / Zachary Lagha",216.55,"Canada","D"],
+  ["Kaitlin Hawayek / Jean-Luc Baker",211.30,"USA","D"],["Shiyue Wang / Xinyu Liu",213.40,"China","D"],
+  ["Elizaveta Khudaiberdieva / Egor Bazin",214.90,"Russia","D"],
+];
+ 
+let globalStreak = 0;
+function updateGlobal(won) { if (won) { globalStreak++; } else { if (globalStreak > 0) saveStreak(globalStreak); globalStreak = 0; } document.getElementById('globalStreakDisplay').textContent = globalStreak; }
+function switchTab(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); el.classList.add('active');
+  if (id === 'leader') fetchLB();
+  if (id === 'tf' && tfCurrent === null) initTF();
+  if (id === 'hl') newHL(); if (id === 'podium') newPodium(); if (id === 'missing') newMissing(); if (id === 'speed') newSpeed();
+}
+function pick(pool) { return pool[Math.random() * pool.length | 0]; }
+function rand4(ans, pool) { let o = [ans]; while (o.length < 4) { let r = pick(pool); if (!o.includes(r)) o.push(r); } return o.sort(() => Math.random() - 0.5); }
+function flash(txt) { let d = document.createElement('div'); d.className = 'flash'; d.textContent = txt; document.body.appendChild(d); setTimeout(() => d.remove(), 700); }
+function shuffleArr(a) { for (let i = a.length - 1; i > 0; i--) { let j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } }
+function pickDistinct(n) { const copy = [...allSkaters]; shuffleArr(copy); return copy.slice(0, n); }
+function resetAllGames() {
+  globalStreak = 0; document.getElementById('globalStreakDisplay').textContent = 0;
+  eStreak = 0; document.getElementById('eStreak').textContent = 0; newEasy();
+  hScore = 0; document.getElementById('hStreakDisplay').textContent = 0; newHard();
+  cStreak = 0; document.getElementById('cStreak').textContent = 0; newCountry();
+  newWordle(); tfCurrent = null; hlStreak = 0; podiumScore = 0; missingStreak = 0;
+  document.querySelectorAll('.tab')[0].click();
+}
+ 
+let eAns, eStreak = 0;
+function newEasy() {
+  eAns = pick(allSkaters); document.getElementById('eScore').textContent = eAns[1]; document.getElementById('eSub').textContent = eAns[2]; document.getElementById('eDisc').innerHTML = discBadge(eAns[3]);
+  let opts = rand4(eAns, allSkaters), box = document.getElementById('eChoices'); box.innerHTML = '';
+  opts.forEach(o => { let b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = o[0]; b.onclick = () => { box.querySelectorAll('button').forEach(x => x.onclick = null); if (o === eAns) { b.classList.add('correct'); eStreak++; updateGlobal(true); document.getElementById('eStreak').textContent = eStreak; flash('✓ +1'); } else { b.classList.add('wrong'); box.querySelectorAll('button').forEach(x => { if (x.textContent === eAns[0]) x.classList.add('correct'); }); saveScore(eStreak, 'Easy'); eStreak = 0; document.getElementById('eStreak').textContent = 0; updateGlobal(false); flash('✗'); } setTimeout(newEasy, 700); }; box.appendChild(b); });
+}
+ 
+let hAns, hScore = 0;
+function newHard() { hAns = pick(allSkaters); document.getElementById('hScore').textContent = hAns[1]; document.getElementById('hSub').innerHTML = hAns[2] + ' · ' + DISCS[hAns[3]]; document.getElementById('hMsg').style.display = 'none'; document.getElementById('hInput').value = ''; }
+function checkHard() {
+  let v = document.getElementById('hInput').value.trim(); if (!v) return; let m = document.getElementById('hMsg'); m.style.display = 'block';
+  if (hAns[0].toLowerCase().includes(v.toLowerCase())) { hScore += 2; flash('✓ +2'); m.textContent = 'Correct! ' + hAns[0]; document.getElementById('hStreakDisplay').textContent = hScore; updateGlobal(true); }
+  else { m.textContent = 'Wrong — ' + hAns[0]; saveScore(hScore, 'Hard'); hScore = 0; document.getElementById('hStreakDisplay').textContent = 0; updateGlobal(false); flash('✗'); }
+  setTimeout(newHard, 900);
+}
+ 
+let cAns, cStreak = 0;
+function newCountry() {
+  cAns = pick(allSkaters); document.getElementById('cName').textContent = cAns[0]; document.getElementById('cSub').textContent = 'PB: ' + cAns[1]; document.getElementById('cDisc').innerHTML = discBadge(cAns[3]);
+  let countries = [...new Set(allSkaters.map(s => s[2]))], opts = [cAns[2]];
+  while (opts.length < 4) { let r = countries[Math.random() * countries.length | 0]; if (!opts.includes(r)) opts.push(r); } opts.sort(() => Math.random() - 0.5);
+  let box = document.getElementById('cChoices'); box.innerHTML = '';
+  opts.forEach(o => { let b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = o; b.onclick = () => { box.querySelectorAll('button').forEach(x => x.onclick = null); if (o === cAns[2]) { b.classList.add('correct'); cStreak++; updateGlobal(true); document.getElementById('cStreak').textContent = cStreak; flash('✓'); } else { b.classList.add('wrong'); box.querySelectorAll('button').forEach(x => { if (x.textContent === cAns[2]) x.classList.add('correct'); }); saveScore(cStreak, 'Country'); cStreak = 0; document.getElementById('cStreak').textContent = 0; updateGlobal(false); flash('✗'); } setTimeout(newCountry, 700); }; box.appendChild(b); });
+}
+ 
+let tAns, tScore = 0, tTime = 30, tIntv = null, tRunning = false;
+const ARC = 150.8;
+function updateArc() { let pct = Math.max(tTime, 0) / 30; document.getElementById('timerArc').style.strokeDashoffset = ARC * (1 - pct); document.getElementById('tTimeSec').textContent = Math.max(tTime, 0); document.getElementById('timerArc').style.stroke = tTime > 10 ? '#4fc3f7' : tTime > 5 ? '#ffd54f' : '#ef5350'; }
+function startTimer() {
+  clearInterval(tIntv); tScore = 0; tTime = 30; tRunning = true; document.getElementById('tScoreDisplay').textContent = 0; document.getElementById('tCard').style.display = 'block'; updateArc(); newTimerQ();
+  tIntv = setInterval(() => { tTime--; updateArc(); if (tTime <= 0) { clearInterval(tIntv); tRunning = false; saveScore(tScore, 'Timer'); document.getElementById('tCard').style.display = 'none'; document.getElementById('tChoices').innerHTML = '<p style="font-size:14px;color:#888;padding:1rem 0">Time up! Score: ' + tScore + '</p>'; } }, 1000);
+}
+function newTimerQ() {
+  if (!tRunning) return; tAns = pick(allSkaters); document.getElementById('tScore').textContent = tAns[1]; document.getElementById('tSub').innerHTML = DISCS[tAns[3]];
+  let opts = rand4(tAns, allSkaters), box = document.getElementById('tChoices'); box.innerHTML = '';
+  opts.forEach(o => { let b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = o[0]; b.onclick = () => { if (!tRunning) return; box.querySelectorAll('button').forEach(x => x.onclick = null); if (o === tAns) { b.classList.add('correct'); tScore++; document.getElementById('tScoreDisplay').textContent = tScore; flash('⚡'); } else { b.classList.add('wrong'); tTime = Math.max(0, tTime - 2); updateArc(); } setTimeout(newTimerQ, 400); }; box.appendChild(b); });
+}
+ 
+let wAns, wAttempts = 0;
+function newWordle() { wAns = pick(allSkaters); wAttempts = 0; document.getElementById('wHistory').innerHTML = ''; document.getElementById('wInput').value = ''; renderHints(); }
+function renderHints() {
+  let h = { Country: wAns[2], Discipline: DISCS[wAns[3]] };
+  if (wAttempts >= 1) h['PB'] = wAns[1]; if (wAttempts >= 2) h['First letter'] = wAns[0][0]; if (wAttempts >= 3) h['Last letter'] = wAns[0].slice(-1); if (wAttempts >= 4) h['Name length'] = wAns[0].length; if (wAttempts >= 5) h['First word'] = wAns[0].split(' ')[0].length + ' letters';
+  document.getElementById('wHints').innerHTML = Object.entries(h).map(([k, v]) => `<div class="hint-item"><span style="display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">${k}</span><b>${v}</b></div>`).join('');
+  document.getElementById('wAttempts').textContent = 'Attempt ' + wAttempts + ' / 6';
+}
+function checkWordle() {
+  let v = document.getElementById('wInput').value.trim(); if (!v) return; wAttempts++; let ok = v.toLowerCase() === wAns[0].toLowerCase();
+  let row = document.createElement('div'); row.className = 'wordle-row ' + (ok ? 'correct' : 'wrong'); row.textContent = (ok ? '✓ ' : '✗ ') + v; document.getElementById('wHistory').appendChild(row); renderHints();
+  if (ok) { flash('🎯'); setTimeout(newWordle, 1200); } else if (wAttempts >= 6) { alert('Answer: ' + wAns[0]); newWordle(); }
+  document.getElementById('wInput').value = '';
+}
+ 
+const CAT_STYLES = { 'Personal Best': 'cat-pb', 'World Record': 'cat-wr', 'Country': 'cat-country', 'Discipline': 'cat-disc', 'Rules': 'cat-rules', 'Score Comparison': 'cat-compare' };
+let tfBank = [], tfUsed = [], tfScoreVal = 0, tfLives = 3, tfLocked = false, tfCurrent = null;
+function buildTFBank() { return [{ s: "Ilia Malinin holds the world record for Men's Singles total score.", a: true, e: "Malinin set the world record of 333.81.", c: "World Record" }, { s: "The men's singles world record is above 340 points.", a: false, e: "Malinin's world record is 333.81, below 340.", c: "World Record" }, { s: "Papadakis and Cizeron hold the Ice Dance world record.", a: true, e: "Their 229.82 at Beijing 2022 is the Ice Dance world record.", c: "World Record" }, { s: "The women's singles world record is above 260 points.", a: false, e: "The record is 255.95, set by Alysa Liu in 2019.", c: "World Record" }, { s: "Sui and Han hold the Pairs world record.", a: true, e: "Their 239.88 at Beijing 2022 is the Pairs world record.", c: "World Record" }, { s: "Malinin was the first to land a quad Axel in competition.", a: true, e: "He did so at the 2022 US International Classic.", c: "World Record" }, { s: "Multiple skaters have landed the quad Axel in ISU competition.", a: false, e: "Only Malinin has done so as of 2024.", c: "World Record" }, { s: "Nathan Chen's men's singles world record exceeded 320 points.", a: true, e: "Chen's record was 320.88 at Beijing 2022.", c: "World Record" }, { s: "Hanyu was the first man to break 300 points.", a: true, e: "He did so at the 2015 Grand Prix Final.", c: "World Record" }, { s: "Malinin's PB is above 330 points.", a: true, e: "His PB is 333.81.", c: "Personal Best" }, { s: "Kagiyama's PB is above 310 points.", a: false, e: "His PB is 306.67.", c: "Personal Best" }, { s: "Sakamoto's PB is above 240 points.", a: false, e: "Her PB is 238.28.", c: "Personal Best" }, { s: "Papadakis/Cizeron's PB is above 225 points.", a: true, e: "Their PB is 229.82.", c: "Personal Best" }, { s: "Sui/Han's PB is higher than Chock/Bates's.", a: true, e: "234.84 vs 222.17.", c: "Personal Best" }, { s: "Sato's PB is higher than Shaidorov's.", a: true, e: "292.08 vs 291.58.", c: "Personal Best" }, { s: "Hendrickx's PB is above 210 points.", a: false, e: "Her PB is 204.96.", c: "Personal Best" }, { s: "Jason Brown's PB is above 260 points.", a: false, e: "His PB is 257.81.", c: "Personal Best" }, { s: "The top ice dance PB beats the top pairs PB.", a: false, e: "Ice dance top: 229.82. Pairs top: 234.84.", c: "Score Comparison" }, { s: "The gap between Malinin's and Kagiyama's PBs is more than 30 points.", a: false, e: "The gap is 27.14 points.", c: "Score Comparison" }, { s: "Miura's PB is within 1 point of Cha's.", a: true, e: "273.73 vs 273.92 — only 0.19 apart.", c: "Score Comparison" }, { s: "Boyang Jin's PB is higher than Jason Brown's.", a: true, e: "258.86 vs 257.81.", c: "Score Comparison" }, { s: "Papadakis and Cizeron are from Italy.", a: false, e: "They represent France.", c: "Country" }, { s: "Kaori Sakamoto represents Japan.", a: true, e: "She is a three-time World Champion for Japan.", c: "Country" }, { s: "Jason Brown represents Canada.", a: false, e: "He competes for the USA.", c: "Country" }, { s: "Donovan Carrillo represents Mexico.", a: true, e: "He is Mexico's top skater.", c: "Country" }, { s: "Kevin Aymoz represents Switzerland.", a: false, e: "He skates for France.", c: "Country" }, { s: "Chock and Bates are a Pairs team.", a: false, e: "They are an Ice Dance team.", c: "Discipline" }, { s: "Sui and Han compete in Pairs skating.", a: true, e: "They are China's top Pairs team.", c: "Discipline" }, { s: "Ice dance teams perform throw jumps.", a: false, e: "Throw jumps are a Pairs element.", c: "Discipline" }, { s: "A quad Axel has a higher base value than a quad Lutz.", a: true, e: "4A: 12.50, 4Lz: 11.50.", c: "Rules" }, { s: "A triple Axel has 3.5 rotations.", a: true, e: "The Axel's forward takeoff adds half a rotation.", c: "Rules" }, { s: "The short program is always skated before the free skate.", a: true, e: "All ISU events go: short program, then free skate.", c: "Rules" }].map(q => ({ statement: q.s, answer: q.a, explanation: q.e, category: q.c })); }
+function initTF() { tfBank = buildTFBank(); shuffleArr(tfBank); tfUsed = []; tfScoreVal = 0; tfLives = 3; tfLocked = false; document.getElementById('tfScore').textContent = 0; renderLives(); renderTFProgress(); nextTF(); }
+function renderLives() { const el = document.getElementById('tfLives'); el.innerHTML = ''; for (let i = 0; i < 3; i++) { const s = document.createElement('span'); s.className = 'tf-life'; s.textContent = i < tfLives ? '❤️' : '🖤'; el.appendChild(s); } }
+function renderTFProgress() { const el = document.getElementById('tfProgress'); el.innerHTML = ''; tfUsed.forEach(r => { const d = document.createElement('div'); d.className = 'tf-dot ' + (r ? 'c' : 'w'); el.appendChild(d); }); }
+function nextTF() { if (!tfBank.length) { tfBank = buildTFBank(); shuffleArr(tfBank); } tfCurrent = tfBank.pop(); tfLocked = false; document.getElementById('tfStatement').textContent = tfCurrent.statement; document.getElementById('tfCatPill').innerHTML = `<span class="cat-pill ${CAT_STYLES[tfCurrent.category] || 'cat-rules'}">${tfCurrent.category}</span>`; document.getElementById('tfExplanation').style.display = 'none'; document.getElementById('tfTrue').className = 'tf-btn true-btn'; document.getElementById('tfFalse').className = 'tf-btn false-btn'; }
+function answerTF(userAnswer) {
+  if (tfLocked) return; tfLocked = true; const correct = userAnswer === tfCurrent.answer;
+  const tBtn = document.getElementById('tfTrue'), fBtn = document.getElementById('tfFalse'), expEl = document.getElementById('tfExplanation');
+  if (correct) { (userAnswer ? tBtn : fBtn).classList.add('correct'); tfScoreVal++; document.getElementById('tfScore').textContent = tfScoreVal; flash('✓ +1'); updateGlobal(true); tfUsed.push(true); }
+  else { (userAnswer ? tBtn : fBtn).classList.add('wrong'); (tfCurrent.answer ? tBtn : fBtn).classList.add('correct'); tfLives--; renderLives(); flash('✗'); updateGlobal(false); tfUsed.push(false); if (tfLives <= 0) { saveScore(tfScoreVal, 'True/False'); expEl.style.display = 'block'; expEl.innerHTML = '<b>Game over!</b> ' + tfCurrent.explanation + '<br><br><button class="btn" style="margin-top:8px;padding:8px 16px;font-size:12px" onclick="initTF()">Play again</button>'; renderTFProgress(); return; } }
+  expEl.style.display = 'block'; expEl.textContent = tfCurrent.explanation; renderTFProgress(); setTimeout(nextTF, 1600);
+}
+ 
+let hlLeft, hlRight, hlStreak = 0, hlLocked = false;
+function newHL() {
+  hlLocked = false; [hlLeft, hlRight] = pickDistinct(2);
+  document.getElementById('hlLeftName').textContent = hlLeft[0]; document.getElementById('hlLeftDisc').innerHTML = discBadge(hlLeft[3]); document.getElementById('hlLeftScore').textContent = hlLeft[1];
+  document.getElementById('hlRightName').textContent = hlRight[0]; document.getElementById('hlRightDisc').innerHTML = discBadge(hlRight[3]); document.getElementById('hlRightScore').textContent = '???'; document.getElementById('hlRightScore').className = 'hl-score hidden';
+  document.getElementById('hlLeft').className = 'hl-card'; document.getElementById('hlRight').className = 'hl-card';
+  document.getElementById('hlHigherBtn').className = 'hl-btn higher'; document.getElementById('hlLowerBtn').className = 'hl-btn lower'; document.getElementById('hlMsg').style.display = 'none';
+}
+function answerHL(guess) {
+  if (hlLocked) return; hlLocked = true;
+  const correct = (guess === 'higher' && hlRight[1] > hlLeft[1]) || (guess === 'lower' && hlRight[1] < hlLeft[1]);
+  document.getElementById('hlRightScore').textContent = hlRight[1]; document.getElementById('hlRightScore').className = 'hl-score';
+  const rightCard = document.getElementById('hlRight'), chosenBtn = document.getElementById(guess === 'higher' ? 'hlHigherBtn' : 'hlLowerBtn'), m = document.getElementById('hlMsg'); m.style.display = 'block';
+  if (correct) { rightCard.classList.add('correct'); chosenBtn.classList.add('correct'); hlStreak++; updateGlobal(true); document.getElementById('hlStreak').textContent = hlStreak; flash('✓ +1'); m.textContent = hlRight[0] + ' scored ' + hlRight[1] + (hlRight[1] > hlLeft[1] ? ' — higher!' : ' — lower!'); }
+  else { rightCard.classList.add('wrong'); chosenBtn.classList.add('wrong'); saveScore(hlStreak, 'Higher/Lower'); hlStreak = 0; document.getElementById('hlStreak').textContent = 0; updateGlobal(false); flash('✗'); m.textContent = hlRight[0] + ' scored ' + hlRight[1] + (hlRight[1] > hlLeft[1] ? ' — that was higher!' : ' — that was lower!'); }
+  setTimeout(newHL, 1400);
+}
+ 
+let podiumSkaters = [], podiumScore = 0, podiumLocked = false;
+function newPodium() { podiumLocked = false; podiumSkaters = pickDistinct(3); shuffleArr(podiumSkaters); document.getElementById('podiumMsg').style.display = 'none'; document.getElementById('podiumSubmit').style.display = 'block'; renderPodiumList(); }
+function renderPodiumList() {
+  const list = document.getElementById('podiumList'); list.innerHTML = '';
+  podiumSkaters.forEach((s, i) => {
+    const item = document.createElement('div'); item.className = 'podium-item'; item.draggable = true; item.dataset.idx = i;
+    item.innerHTML = `<div class="podium-pos">${i + 1}</div><div class="podium-name">${s[0]}<br><span style="font-size:11px;color:#888">${DISCS[s[3]]} · ${s[2]}</span></div><div class="podium-score">???</div>`;
+    item.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', i); item.classList.add('dragging'); });
+    item.addEventListener('dragend', () => item.classList.remove('dragging'));
+    item.addEventListener('dragover', e => { e.preventDefault(); item.classList.add('drag-over'); });
+    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+    item.addEventListener('drop', e => { e.preventDefault(); item.classList.remove('drag-over'); const from = +e.dataTransfer.getData('text/plain'); const to = +item.dataset.idx; if (from === to) return; const tmp = podiumSkaters[from]; podiumSkaters[from] = podiumSkaters[to]; podiumSkaters[to] = tmp; renderPodiumList(); });
+    list.appendChild(item);
+  });
+}
+function checkPodium() {
+  if (podiumLocked) return; podiumLocked = true; const sorted = [...podiumSkaters].sort((a, b) => b[1] - a[1]); const allCorrect = podiumSkaters.every((s, i) => s === sorted[i]);
+  document.querySelectorAll('.podium-item').forEach((item, i) => { item.querySelector('.podium-score').textContent = podiumSkaters[i][1]; item.classList.add(podiumSkaters[i] === sorted[i] ? 'correct' : 'wrong'); });
+  const m = document.getElementById('podiumMsg'); m.style.display = 'block'; document.getElementById('podiumSubmit').style.display = 'none';
+  if (allCorrect) { podiumScore += 3; flash('✓ +3'); m.textContent = 'Perfect! All 3 in the right order.'; updateGlobal(true); }
+  else { const got = podiumSkaters.filter((s, i) => s === sorted[i]).length; m.textContent = got + '/3 correct. Correct order: ' + sorted.map(s => s[0].split(' ')[0]).join(' > '); if (got > 0) { podiumScore += got; flash('~'); } else { saveScore(podiumScore, 'Podium'); podiumScore = 0; updateGlobal(false); flash('✗'); } }
+  document.getElementById('podiumScore').textContent = podiumScore; setTimeout(newPodium, 2200);
+}
+ 
+let missingAns, missingDigit, missingPos, missingStreak = 0, missingLocked = false;
+function newMissing() {
+  missingLocked = false; missingAns = pick(allSkaters); const scoreStr = missingAns[1].toString();
+  const digits = scoreStr.replace('.', '').split('').filter(c => c >= '0' && c <= '9'); missingPos = Math.floor(Math.random() * digits.length); missingDigit = digits[missingPos];
+  let raw = scoreStr, blankCount = 0, display = '';
+  for (let i = 0; i < raw.length; i++) { if (raw[i] === '.') { display += '.'; continue; } if (blankCount === missingPos) { display += '<span class="blank">_</span>'; } else { display += raw[i]; } blankCount++; }
+  document.getElementById('missingName').textContent = missingAns[0]; document.getElementById('missingSub').innerHTML = missingAns[2] + ' · ' + discBadge(missingAns[3]); document.getElementById('missingDisplay').innerHTML = display; document.getElementById('missingMsg').style.display = 'none';
+  const grid = document.getElementById('digitGrid'); grid.innerHTML = '';
+  ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].forEach(d => {
+    const b = document.createElement('button'); b.className = 'digit-btn'; b.textContent = d;
+    b.onclick = () => { if (missingLocked) return; missingLocked = true; grid.querySelectorAll('button').forEach(x => x.onclick = null); const m = document.getElementById('missingMsg'); m.style.display = 'block'; if (d === missingDigit) { b.classList.add('correct'); missingStreak++; updateGlobal(true); document.getElementById('missingStreak').textContent = missingStreak; flash('✓ +1'); m.textContent = 'Correct! Full score: ' + missingAns[1]; } else { b.classList.add('wrong'); grid.querySelectorAll('button').forEach(x => { if (x.textContent === missingDigit) x.classList.add('correct'); }); saveScore(missingStreak, 'Missing Score'); missingStreak = 0; document.getElementById('missingStreak').textContent = 0; updateGlobal(false); flash('✗'); m.textContent = 'Wrong! Missing digit: ' + missingDigit + '. Full score: ' + missingAns[1]; } setTimeout(newMissing, 1400); };
+    grid.appendChild(b);
+  });
+}
+ 
+let speedScore = 0, speedWrong = 0, speedLocked = false;
+const speedQTypes = ['pb', 'country', 'discipline'];
+function startSpeed() { speedScore = 0; speedWrong = 0; document.getElementById('speedScore').textContent = 0; document.getElementById('speedWrong').textContent = '0 wrong'; newSpeed(); }
+function newSpeed() {
+  speedLocked = false; const type = speedQTypes[Math.floor(Math.random() * speedQTypes.length)]; const ans = pick(allSkaters); let q, opts, correct;
+  if (type === 'pb') { q = "What is " + ans[0] + "'s personal best score?"; correct = ans[1].toString(); opts = rand4(ans, allSkaters).map(s => s[1].toString()); document.getElementById('speedLabel').textContent = 'Personal Best'; }
+  else if (type === 'country') { q = "Which country does " + ans[0] + " represent?"; correct = ans[2]; const countries = [...new Set(allSkaters.map(s => s[2]))]; opts = [ans[2]]; while (opts.length < 4) { let r = countries[Math.random() * countries.length | 0]; if (!opts.includes(r)) opts.push(r); } opts.sort(() => Math.random() - 0.5); document.getElementById('speedLabel').textContent = 'Country'; }
+  else { q = "What discipline does " + ans[0] + " compete in?"; correct = DISCS[ans[3]]; opts = [...new Set(allSkaters.map(s => DISCS[s[3]]))].sort(() => Math.random() - 0.5); if (!opts.includes(correct)) opts[0] = correct; opts = opts.slice(0, 4); document.getElementById('speedLabel').textContent = 'Discipline'; }
+  document.getElementById('speedQ').textContent = q; const box = document.getElementById('speedChoices'); box.innerHTML = ''; const r = document.getElementById('speedResult'); r.style.display = 'none';
+  opts.forEach(o => {
+    const b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = o;
+    b.onclick = () => { if (speedLocked) return; speedLocked = true; box.querySelectorAll('button').forEach(x => x.onclick = null); if (o === correct) { b.classList.add('correct'); speedScore++; document.getElementById('speedScore').textContent = speedScore; updateGlobal(true); flash('⚡'); r.className = 'speed-result ok'; r.style.display = 'block'; r.textContent = 'Correct!'; } else { b.classList.add('wrong'); box.querySelectorAll('button').forEach(x => { if (x.textContent === correct) x.classList.add('correct'); }); speedWrong++; document.getElementById('speedWrong').textContent = speedWrong + ' wrong'; if (speedWrong >= 3) { saveScore(speedScore, 'Speed Round'); r.className = 'speed-result bad'; r.style.display = 'block'; r.textContent = '3 wrong — game over! Score: ' + speedScore + '. Hit New game to retry.'; updateGlobal(false); flash('✗'); return; } updateGlobal(false); flash('✗'); r.className = 'speed-result bad'; r.style.display = 'block'; r.textContent = 'Wrong! Answer: ' + correct; } setTimeout(newSpeed, 900); };
+    box.appendChild(b);
+  });
+}
+ 
+renderProfileGrid();
+const _p = loadProfiles(); if (_p.length === 1) loginAs(_p[0].name);
+</script>
+</body>
+</html>
