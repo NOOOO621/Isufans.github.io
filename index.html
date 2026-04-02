@@ -34,7 +34,7 @@ body{background:#f5f5f5;min-height:100vh;}
 .score-bar b{color:#4fc3f7;font-family:'Space Mono',monospace;}
 .tabs{display:flex;gap:3px;background:#f0f0f0;padding:4px;border-radius:12px;border:0.5px solid #ddd;margin-bottom:1.5rem;overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{flex:1;min-width:44px;padding:7px 5px;border:none;background:transparent;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;color:#888;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.tab{flex:1;min-width:42px;padding:7px 4px;border:none;background:transparent;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;color:#888;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
 .tab.active{background:white;color:#111;border:0.5px solid #ccc;}
 .panel{display:none;}.panel.active{display:block;}
 .q-card{background:white;border:0.5px solid #ddd;border-radius:12px;padding:1.5rem;margin-bottom:1rem;}
@@ -87,12 +87,22 @@ body{background:#f5f5f5;min-height:100vh;}
 .cat-rules{background:#e3f2fd;color:#0277bd;}.cat-compare{background:#fce4ec;color:#880e4f;}
 .flash{position:fixed;top:20%;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:28px;font-weight:700;pointer-events:none;animation:flashUp 0.7s ease forwards;z-index:999;}
 @keyframes flashUp{0%{opacity:0;transform:translateX(-50%) translateY(10px) scale(0.8);}30%{opacity:1;transform:translateX(-50%) translateY(-5px) scale(1.1);}70%{opacity:1;transform:translateX(-50%) translateY(-10px) scale(1);}100%{opacity:0;transform:translateX(-50%) translateY(-30px) scale(0.9);}}
-.mode-badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:0.06em;padding:3px 8px;border-radius:4px;background:#f0f0f0;color:#888;border:0.5px solid #ddd;margin-bottom:1rem;}
+.mode-badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:0.06em;padding:3px 8px;border-radius:4px;background:#f0f0f0;color:#888;border:0.5px solid #ddd;margin-bottom:0.75rem;}
 .mode-badge.hard-mode{background:#fff3e0;color:#e65100;border-color:#ffb74d;}
 .mode-badge.timer-mode{background:#e3f2fd;color:#0277bd;border-color:#64b5f6;}
 .mode-badge.wordle-mode{background:#f3e5f5;color:#6a1b9a;border-color:#ce93d8;}
 .mode-badge.country-mode{background:#e8f5e9;color:#1b5e20;border-color:#81c784;}
 .mode-badge.tf-mode{background:#fce4ec;color:#880e4f;border-color:#f48fb1;}
+.mode-badge.career-mode{background:#e8eaf6;color:#283593;border-color:#9fa8da;}
+.mode-desc{font-size:12px;color:#888;line-height:1.6;padding:10px 14px;background:#f5f5f5;border-radius:8px;margin-top:1rem;border-left:3px solid #ddd;}
+/* EXPLANATION BOX — shown after every answer */
+.answer-exp{font-size:13px;line-height:1.55;padding:11px 14px;border-radius:8px;margin-top:0.75rem;display:none;}
+.answer-exp.ok{background:#e8f5e9;color:#1b5e20;border-left:3px solid #66bb6a;}
+.answer-exp .ok-btn{background:#0d2137;color:white;border:none;padding:7px 18px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;margin-top:10px;display:block;}
+.answer-exp.ok .ok-btn{background:#2e7d32;}
+.answer-exp.bad .ok-btn{background:#c62828;}
+.tf-explanation .ok-btn,.career-result .ok-btn{background:#0d2137;color:white;border:none;padding:7px 18px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;margin-top:10px;display:block;}
+.answer-exp.bad{background:#ffebee;color:#c62828;border-left:3px solid #ef5350;}
 .hl-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
 .hl-card{background:white;border:0.5px solid #ddd;border-radius:12px;padding:1rem;text-align:center;}
 .hl-card.correct{border-color:#66bb6a;background:#e8f5e9;}
@@ -130,6 +140,8 @@ body{background:#f5f5f5;min-height:100vh;}
 .speed-result{font-size:13px;padding:8px 12px;border-radius:8px;margin-top:0.75rem;display:none;}
 .speed-result.ok{background:#e8f5e9;color:#2e7d32;}
 .speed-result.bad{background:#ffebee;color:#c62828;}
+.career-q{font-size:17px;font-weight:500;color:#111;line-height:1.5;margin-bottom:1.5rem;min-height:56px;}
+.career-result{font-size:13px;padding:10px 14px;border-radius:8px;background:#f5f5f5;color:#888;margin-top:0.75rem;display:none;line-height:1.5;}
 .online-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#888;}
 .online-dot{width:7px;height:7px;border-radius:50%;background:#66bb6a;animation:pulse 2s infinite;}
 .online-dot.offline{background:#ef5350;animation:none;}
@@ -185,28 +197,38 @@ body{background:#f5f5f5;min-height:100vh;}
       <button class="tab" onclick="switchTab('podium',this)">Podium</button>
       <button class="tab" onclick="switchTab('missing',this)">Missing</button>
       <button class="tab" onclick="switchTab('speed',this)">Speed</button>
+      <button class="tab" onclick="switchTab('career',this)">Career</button>
       <button class="tab" onclick="switchTab('leader',this)">Board</button>
     </div>
  
     <div id="easy" class="panel active">
-      <div class="mode-badge">Identify the skater by their personal best score</div>
+      <div class="mode-badge">PB Score → Name</div>
       <div class="streak-pill">Streak <b id="eStreak">0</b></div>
       <div class="q-card"><div class="q-label">Personal Best Score</div><div class="q-value" id="eScore">—</div><div class="q-sub" id="eSub"></div><div id="eDisc"></div></div>
       <div class="choices" id="eChoices"></div>
+      <div class="answer-exp" id="eExp"></div>
+      <div class="mode-desc">You are shown a skater's personal best total score and must pick the correct skater from four options. Scores come from across all disciplines — Singles, Pairs and Ice Dance — so pay attention to the discipline badge. Build the longest streak you can before guessing wrong.</div>
     </div>
+ 
     <div id="hard" class="panel">
-      <div class="mode-badge hard-mode">Type the answer · +2 pts per correct</div>
+      <div class="mode-badge hard-mode">Type the answer · +2 pts</div>
       <div class="streak-pill">Score <b id="hStreakDisplay">0</b></div>
       <div class="q-card"><div class="q-label">Personal Best Score</div><div class="q-value" id="hScore">—</div><div class="q-sub" id="hSub"></div></div>
       <div class="text-input-row"><input id="hInput" placeholder="Skater name..." onkeydown="if(event.key==='Enter')checkHard()"><button onclick="checkHard()">Submit</button></div>
       <div class="result-msg" id="hMsg"></div>
+      <div class="answer-exp" id="hExp"></div>
+      <div class="mode-desc">Same as Easy but you type the skater's name yourself. Partial matches count — a last name is enough. Each correct answer is worth 2 points. One wrong answer ends your run and saves your score.</div>
     </div>
+ 
     <div id="country" class="panel">
-      <div class="mode-badge country-mode">Match the skater to their country</div>
+      <div class="mode-badge country-mode">Name → Country</div>
       <div class="streak-pill">Streak <b id="cStreak">0</b></div>
       <div class="q-card"><div class="q-label">Skater</div><div class="q-value" style="font-size:18px;margin-top:4px;line-height:1.3" id="cName">—</div><div class="q-sub" id="cSub"></div><div id="cDisc"></div></div>
       <div class="choices" id="cChoices"></div>
+      <div class="answer-exp" id="cExp"></div>
+      <div class="mode-desc">A skater's name is shown and you must identify which country they represent. Four options are given. With over 20 countries in the roster — from Belgium to Kazakhstan to Australia — you'll need to know your federations.</div>
     </div>
+ 
     <div id="timer" class="panel">
       <div class="mode-badge timer-mode">30 seconds · wrong = -2s</div>
       <div class="timer-display">
@@ -216,14 +238,19 @@ body{background:#f5f5f5;min-height:100vh;}
       </div>
       <div class="q-card" id="tCard" style="display:none"><div class="q-label">Personal Best Score</div><div class="q-value" id="tScore">—</div><div class="q-sub" id="tSub"></div></div>
       <div class="choices" id="tChoices"></div>
+      <div class="answer-exp" id="tExp"></div>
+      <div class="mode-desc">PB scores appear and you pick the correct skater — but the clock is always ticking. 30 seconds total. Every wrong answer costs 2 seconds. The timer ring turns yellow then red as time runs out.</div>
     </div>
+ 
     <div id="wordle" class="panel">
-      <div class="mode-badge wordle-mode">Guess the skater · up to 6 tries</div>
+      <div class="mode-badge wordle-mode">Guess the skater · 6 tries</div>
       <div class="hint-card" id="wHints"></div>
       <div style="margin-bottom:0.75rem;font-size:13px;color:#888" id="wAttempts">Attempt 0 / 6</div>
       <div class="text-input-row"><input id="wInput" placeholder="Skater name..." onkeydown="if(event.key==='Enter')checkWordle()"><button onclick="checkWordle()">Guess</button></div>
       <div class="wordle-history" id="wHistory"></div>
+      <div class="mode-desc">A mystery skater is chosen and you have up to 6 attempts to guess their name. You start with country and discipline hints. Each wrong guess unlocks more: PB score, first letter, last letter, name length, and first name length. Guess sooner for a higher score.</div>
     </div>
+ 
     <div id="tf" class="panel">
       <div class="mode-badge tf-mode">3 lives · true or false</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
@@ -237,42 +264,69 @@ body{background:#f5f5f5;min-height:100vh;}
         <div class="tf-btns"><button class="tf-btn true-btn" id="tfTrue" onclick="answerTF(true)">TRUE</button><button class="tf-btn false-btn" id="tfFalse" onclick="answerTF(false)">FALSE</button></div>
         <div class="tf-explanation" id="tfExplanation"></div>
       </div>
+      <div class="mode-desc">A statement about figure skating is shown — world records, PB comparisons, countries, disciplines, or rules. Judge it true or false. You have 3 lives. Every answer reveals a fact explaining the real answer.</div>
     </div>
+ 
     <div id="hl" class="panel">
-      <div class="mode-badge" style="background:#e8f5e9;color:#1b5e20;border-color:#a5d6a7;">Is the next skater's PB higher or lower?</div>
+      <div class="mode-badge" style="background:#e8f5e9;color:#1b5e20;border-color:#a5d6a7;">PB comparison chain</div>
       <div class="streak-pill">Streak <b id="hlStreak">0</b></div>
       <div class="hl-cards">
         <div class="hl-card" id="hlLeft"><div class="hl-name" id="hlLeftName">—</div><div style="font-size:12px;color:#888;margin-bottom:6px" id="hlLeftDisc"></div><div class="hl-score" id="hlLeftScore">—</div></div>
         <div class="hl-card" id="hlRight"><div class="hl-name" id="hlRightName">—</div><div style="font-size:12px;color:#888;margin-bottom:6px" id="hlRightDisc"></div><div class="hl-score hidden" id="hlRightScore">???</div></div>
       </div>
       <div class="hl-btns"><button class="hl-btn higher" id="hlHigherBtn" onclick="answerHL('higher')">▲ Higher</button><button class="hl-btn lower" id="hlLowerBtn" onclick="answerHL('lower')">▼ Lower</button></div>
-      <div class="result-msg" id="hlMsg"></div>
+      <div class="answer-exp" id="hlExp"></div>
+      <div class="mode-desc">Two skaters appear side by side. The left card shows their PB. The right card hides theirs behind "???". Decide whether the right skater scored higher or lower. One wrong guess ends the chain.</div>
     </div>
+ 
     <div id="podium" class="panel">
-      <div class="mode-badge" style="background:#fff8e1;color:#e65100;border-color:#ffe082;">Drag to rank these 3 skaters by PB (1st = highest)</div>
+      <div class="mode-badge" style="background:#fff8e1;color:#e65100;border-color:#ffe082;">Drag to rank · 1st = highest</div>
       <div class="streak-pill">Score <b id="podiumScore">0</b></div>
       <div class="podium-skaters" id="podiumList"></div>
       <button class="btn" id="podiumSubmit" onclick="checkPodium()">Submit order</button>
       <div class="result-msg" id="podiumMsg"></div>
+      <div class="answer-exp" id="podiumExp"></div>
+      <div class="mode-desc">Three skaters appear in a random order. Drag and drop them to rank from highest PB (1st) to lowest (3rd), then hit Submit. Perfect order scores 3 points. Partial credit for 1 or 2 correct.</div>
     </div>
+ 
     <div id="missing" class="panel">
-      <div class="mode-badge" style="background:#e8eaf6;color:#283593;border-color:#9fa8da;">Fill in the missing digit of the skater's PB</div>
+      <div class="mode-badge" style="background:#e8eaf6;color:#283593;border-color:#9fa8da;">Fill the missing digit</div>
       <div class="streak-pill">Streak <b id="missingStreak">0</b></div>
       <div class="q-card"><div class="q-label">Skater</div><div class="q-value" style="font-size:20px;margin-bottom:0.5rem" id="missingName">—</div><div class="q-sub" id="missingSub"></div><div class="missing-display" id="missingDisplay">—</div></div>
       <div class="digit-grid" id="digitGrid"></div>
       <div class="result-msg" id="missingMsg"></div>
+      <div class="mode-desc">A skater's PB is shown with one digit replaced by a blank. Pick the missing digit from 0–9. You need a genuine feel for specific scores to do well. One wrong answer ends your streak.</div>
     </div>
+ 
     <div id="speed" class="panel">
-      <div class="mode-badge" style="background:#fce4ec;color:#880e4f;border-color:#f48fb1;">Answer fast · 3 wrong ends the game</div>
+      <div class="mode-badge" style="background:#fce4ec;color:#880e4f;border-color:#f48fb1;">Rapid fire · 3 wrong = game over</div>
       <div class="speed-header">
         <div><div class="speed-counter" id="speedScore">0</div><div style="font-size:12px;color:#888">correct answers</div></div>
         <div style="text-align:right"><div style="font-family:'Space Mono',monospace;font-size:13px;color:#888" id="speedWrong">0 wrong</div><button class="btn btn-sm" style="margin-top:6px" onclick="startSpeed()">New game</button></div>
       </div>
       <div class="q-card"><div class="q-label" id="speedLabel">Question</div><div class="speed-q" id="speedQ">Press New game to start</div><div class="speed-choices" id="speedChoices"></div><div class="speed-result" id="speedResult"></div></div>
+      <div class="mode-desc">Rapid-fire questions mixing PB scores, countries, and disciplines with no time limit. 3 wrong answers ends the game. Questions rotate randomly so you never know what's coming next.</div>
     </div>
+ 
+    <div id="career" class="panel">
+      <div class="mode-badge career-mode">Career facts · 3 lives</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <div class="streak-pill" style="margin-bottom:0">Score <b id="careerScore">0</b></div>
+        <div class="tf-lives" id="careerLives"></div>
+      </div>
+      <div class="tf-progress" id="careerProgress"></div>
+      <div class="q-card">
+        <div class="q-label" id="careerLabel">Career Question</div>
+        <div class="career-q" id="careerQ">Loading…</div>
+        <div class="choices" id="careerChoices"></div>
+        <div class="career-result" id="careerResult"></div>
+      </div>
+      <div class="mode-desc">Multiple-choice questions about real career achievements — Olympic medals, World Championship titles, Grand Prix history, skating rules and milestones. No PB scores involved. 3 lives.</div>
+    </div>
+ 
     <div id="leader" class="panel">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <div class="online-badge"><span class="online-dot" id="lbDot"></span> <span id="lbStatus">Global leaderboard</span></div>
+        <div class="online-badge"><span class="online-dot" id="lbDot"></span><span id="lbStatus" style="margin-left:5px">Global leaderboard</span></div>
         <button class="btn btn-sm" onclick="fetchLB()">Refresh</button>
       </div>
       <div class="lb-tabs">
@@ -287,6 +341,7 @@ body{background:#f5f5f5;min-height:100vh;}
         <button class="lb-tab" onclick="showLBSection('Podium',this)">Podium</button>
         <button class="lb-tab" onclick="showLBSection('Missing Score',this)">Missing</button>
         <button class="lb-tab" onclick="showLBSection('Speed Round',this)">Speed</button>
+        <button class="lb-tab" onclick="showLBSection('Career Quiz',this)">Career</button>
       </div>
       <div class="lb-list" id="lbList"><div class="lb-loading">Loading…</div></div>
     </div>
@@ -294,135 +349,171 @@ body{background:#f5f5f5;min-height:100vh;}
 </div>
  
 <script>
-// ── CREDENTIALS ───────────────────────────────────────────────────────────────
 const BIN_ID  = '69cea45faaba882197bba65b';
 const API_KEY = '$2a$10$25hRvSa9yLuYxUo9Z/6RQOSgFpkHKcz/6KCq.rZ61nF2rpLJKvJ36';
 const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+let onlineLB=[],currentLBSection='all';
  
-// ── ONLINE LEADERBOARD ────────────────────────────────────────────────────────
-let onlineLB = [], currentLBSection = 'all';
- 
-function setLBOnline(online) {
-  const dot = document.getElementById('lbDot');
-  const txt = document.getElementById('lbStatus');
-  if (online) { dot.className = 'online-dot'; txt.textContent = 'Global leaderboard'; }
-  else { dot.className = 'online-dot offline'; txt.textContent = 'Offline — scores saved locally'; }
+function setLBOnline(on){const d=document.getElementById('lbDot'),t=document.getElementById('lbStatus');if(on){d.className='online-dot';t.textContent='Global leaderboard';}else{d.className='online-dot offline';t.textContent='Offline';}}
+async function fetchLB(){
+  document.getElementById('lbList').innerHTML='<div class="lb-loading">Loading…</div>';
+  try{const r=await fetch(BIN_URL+'/latest',{headers:{'X-Master-Key':API_KEY,'X-Bin-Meta':'false'}});if(!r.ok)throw new Error();const data=await r.json();onlineLB=Array.isArray(data)?data:[];setLBOnline(true);renderLBSection(currentLBSection);}
+  catch(e){setLBOnline(false);document.getElementById('lbList').innerHTML='<div class="lb-loading">Could not reach leaderboard.</div>';}
 }
- 
-async function fetchLB() {
-  document.getElementById('lbList').innerHTML = '<div class="lb-loading">Loading…</div>';
-  try {
-    const r = await fetch(BIN_URL + '/latest', { headers: { 'X-Master-Key': API_KEY, 'X-Bin-Meta': 'false' } });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const data = await r.json();
-    onlineLB = Array.isArray(data) ? data : [];
-    setLBOnline(true);
-    renderLBSection(currentLBSection);
-  } catch (e) {
-    setLBOnline(false);
-    document.getElementById('lbList').innerHTML = '<div class="lb-loading">Could not reach leaderboard server.</div>';
-  }
+async function pushScore(entry){
+  onlineLB.push(entry);onlineLB.sort((a,b)=>b.score-a.score);onlineLB=onlineLB.slice(0,200);
+  try{const r=await fetch(BIN_URL,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},body:JSON.stringify(onlineLB)});if(r.ok)setLBOnline(true);}catch(e){setLBOnline(false);}
 }
- 
-async function pushScore(entry) {
-  onlineLB.push(entry);
-  onlineLB.sort((a, b) => b.score - a.score);
-  onlineLB = onlineLB.slice(0, 200);
-  try {
-    const r = await fetch(BIN_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY }, body: JSON.stringify(onlineLB) });
-    if (r.ok) setLBOnline(true);
-  } catch (e) { setLBOnline(false); }
-}
- 
-function showLBSection(section, el) {
-  currentLBSection = section;
-  document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  renderLBSection(section);
-}
- 
-function renderLBSection(section) {
-  const el = document.getElementById('lbList');
-  let filtered;
-  if (section === 'all') {
-    const best = {};
-    onlineLB.filter(e => e.mode !== 'Streak').forEach(e => { if (!best[e.user] || e.score > best[e.user].score) best[e.user] = e; });
-    filtered = Object.values(best).sort((a, b) => b.score - a.score);
-  } else {
-    const best = {};
-    onlineLB.filter(e => e.mode === section).forEach(e => { if (!best[e.user] || e.score > best[e.user].score) best[e.user] = e; });
-    filtered = Object.values(best).sort((a, b) => b.score - a.score);
-  }
-  if (!filtered.length) { el.innerHTML = '<p style="color:#888;font-size:14px;padding:1rem 0">No scores yet for this mode!</p>'; return; }
-  const medals = ['#1', '#2', '#3'], cls = ['gold', 'silver', 'bronze'];
-  el.innerHTML = filtered.slice(0, 20).map((x, i) => {
-    const [bg, fg] = avatarColors(x.user); const isMe = x.user === currentProfile;
-    const label = section === 'Streak' ? 'streak' : (section === 'all' ? x.mode : 'pts');
-    return `<div class="lb-row" style="${isMe ? 'border-color:#4fc3f7;border-width:1.5px;' : ''}">
-      <div class="lb-rank ${cls[i] || ''}">${medals[i] || '#' + (i + 1)}</div>
+function showLBSection(section,el){currentLBSection=section;document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderLBSection(section);}
+function renderLBSection(section){
+  const el=document.getElementById('lbList');let filtered;
+  if(section==='all'){const best={};onlineLB.filter(e=>e.mode!=='Streak').forEach(e=>{if(!best[e.user]||e.score>best[e.user].score)best[e.user]=e;});filtered=Object.values(best).sort((a,b)=>b.score-a.score);}
+  else{const best={};onlineLB.filter(e=>e.mode===section).forEach(e=>{if(!best[e.user]||e.score>best[e.user].score)best[e.user]=e;});filtered=Object.values(best).sort((a,b)=>b.score-a.score);}
+  if(!filtered.length){el.innerHTML='<p style="color:#888;font-size:14px;padding:1rem 0">No scores yet for this mode!</p>';return;}
+  const medals=['#1','#2','#3'],cls=['gold','silver','bronze'];
+  el.innerHTML=filtered.slice(0,20).map((x,i)=>{
+    const[bg,fg]=avatarColors(x.user);const isMe=x.user===currentProfile;
+    const label=section==='Streak'?'streak':(section==='all'?x.mode:'pts');
+    return`<div class="lb-row" style="${isMe?'border-color:#4fc3f7;border-width:1.5px;':''}">
+      <div class="lb-rank ${cls[i]||''}">${medals[i]||'#'+(i+1)}</div>
       <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;flex-shrink:0;background:${bg};color:${fg}">${initials(x.user)}</div>
-      <div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:500;color:#111">${x.user}${isMe ? ' <span style="font-size:10px;color:#4fc3f7">you</span>' : ''}</div><div style="font-size:11px;color:#888">${section === 'all' ? x.mode : x.date}</div></div>
+      <div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:500;color:#111">${x.user}${isMe?' <span style="font-size:10px;color:#4fc3f7">you</span>':''}</div><div style="font-size:11px;color:#888">${section==='all'?x.mode:x.date}</div></div>
       <div style="display:flex;align-items:baseline;gap:3px"><div class="lb-score">${x.score}</div><div class="lb-score-label">${label}</div></div>
     </div>`;
   }).join('');
 }
  
-// ── PROFILES ──────────────────────────────────────────────────────────────────
-const AVATAR_COLORS = [['#e3f2fd','#0277bd'],['#fce4ec','#c2185b'],['#e8f5e9','#1b5e20'],['#fff8e1','#f57f17'],['#f3e5f5','#7b1fa2'],['#e8eaf6','#283593'],['#fbe9e7','#bf360c'],['#e0f7fa','#006064']];
-function avatarColors(name) { let h = 0; for (let c of name) h = (h * 31 + c.charCodeAt(0)) % AVATAR_COLORS.length; return AVATAR_COLORS[h]; }
-function initials(n) { return n.slice(0, 2).toUpperCase(); }
-const STORE_KEY = 'isuProfiles_v2';
-let currentProfile = null;
-function loadProfiles() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch (e) { return []; } }
-function saveProfiles(p) { try { localStorage.setItem(STORE_KEY, JSON.stringify(p)); } catch (e) { } }
-function createProfile() {
-  const input = document.getElementById('newProfileInput'), name = input.value.trim(), err = document.getElementById('profileError');
-  if (!name || name.length < 2) { err.textContent = 'Username must be at least 2 characters.'; return; }
-  const profiles = loadProfiles();
-  if (profiles.find(p => p.name.toLowerCase() === name.toLowerCase())) { err.textContent = 'That username is taken on this device.'; return; }
-  profiles.push({ name, created: Date.now() }); saveProfiles(profiles); input.value = ''; err.textContent = ''; renderProfileGrid(); loginAs(name);
+const AVATAR_COLORS=[['#e3f2fd','#0277bd'],['#fce4ec','#c2185b'],['#e8f5e9','#1b5e20'],['#fff8e1','#f57f17'],['#f3e5f5','#7b1fa2'],['#e8eaf6','#283593'],['#fbe9e7','#bf360c'],['#e0f7fa','#006064']];
+function avatarColors(name){let h=0;for(let c of name)h=(h*31+c.charCodeAt(0))%AVATAR_COLORS.length;return AVATAR_COLORS[h];}
+function initials(n){return n.slice(0,2).toUpperCase();}
+const STORE_KEY='isuProfiles_v2';
+let currentProfile=null;
+function loadProfiles(){try{return JSON.parse(localStorage.getItem(STORE_KEY)||'[]');}catch(e){return[];}}
+function saveProfiles(p){try{localStorage.setItem(STORE_KEY,JSON.stringify(p));}catch(e){}}
+function createProfile(){
+  const input=document.getElementById('newProfileInput'),name=input.value.trim(),err=document.getElementById('profileError');
+  if(!name||name.length<2){err.textContent='Username must be at least 2 characters.';return;}
+  const profiles=loadProfiles();if(profiles.find(p=>p.name.toLowerCase()===name.toLowerCase())){err.textContent='That username is taken on this device.';return;}
+  profiles.push({name,created:Date.now()});saveProfiles(profiles);input.value='';err.textContent='';renderProfileGrid();loginAs(name);
 }
-function deleteProfile(name, e) {
-  e.stopPropagation(); if (!confirm('Delete "' + name + '" from this device?')) return;
-  saveProfiles(loadProfiles().filter(p => p.name !== name)); renderProfileGrid();
+function deleteProfile(name,e){e.stopPropagation();if(!confirm('Delete "'+name+'" from this device?'))return;saveProfiles(loadProfiles().filter(p=>p.name!==name));renderProfileGrid();}
+function loginAs(name){
+  currentProfile=name;document.getElementById('profileScreen').style.display='none';document.getElementById('mainApp').style.display='block';
+  const[bg,fg]=avatarColors(name);const av=document.getElementById('headerAvatar');
+  av.style.cssText=`background:${bg};color:${fg};width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;flex-shrink:0;`;
+  av.textContent=initials(name);document.getElementById('headerName').textContent=name;resetAllGames();fetchLB();
 }
-function loginAs(name) {
-  currentProfile = name;
-  document.getElementById('profileScreen').style.display = 'none';
-  document.getElementById('mainApp').style.display = 'block';
-  const [bg, fg] = avatarColors(name);
-  const av = document.getElementById('headerAvatar');
-  av.style.cssText = `background:${bg};color:${fg};width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;flex-shrink:0;`;
-  av.textContent = initials(name);
-  document.getElementById('headerName').textContent = name;
-  resetAllGames(); fetchLB();
-}
-function showProfileScreen() { document.getElementById('mainApp').style.display = 'none'; document.getElementById('profileScreen').style.display = 'block'; renderProfileGrid(); }
-function renderProfileGrid() {
-  const profiles = loadProfiles(), grid = document.getElementById('profileGrid');
-  if (!profiles.length) { grid.innerHTML = '<p style="font-size:13px;color:#888;text-align:center">No profiles yet</p>'; return; }
-  grid.innerHTML = '';
-  profiles.forEach(p => {
-    const [bg, fg] = avatarColors(p.name);
-    const top = onlineLB.filter(e => e.user === p.name && e.mode !== 'Streak').reduce((m, e) => Math.max(m, e.score), 0);
-    const bestStreak = onlineLB.filter(e => e.user === p.name && e.mode === 'Streak').reduce((m, e) => Math.max(m, e.score), 0);
-    const card = document.createElement('div'); card.className = 'profile-card' + (currentProfile === p.name ? ' selected' : ''); card.onclick = () => loginAs(p.name);
-    card.innerHTML = `<div class="profile-avatar" style="background:${bg};color:${fg}">${initials(p.name)}</div><div><div class="profile-name">${p.name}</div><div class="profile-meta">${top > 0 ? 'Best: ' + top + ' pts' : 'No scores yet'}${bestStreak > 0 ? ' · 🔥' + bestStreak : ''}</div></div><div class="profile-delete" onclick="deleteProfile('${p.name.replace(/'/g, "\\'")}',event)">×</div>`;
+function showProfileScreen(){document.getElementById('mainApp').style.display='none';document.getElementById('profileScreen').style.display='block';renderProfileGrid();}
+function renderProfileGrid(){
+  const profiles=loadProfiles(),grid=document.getElementById('profileGrid');
+  if(!profiles.length){grid.innerHTML='<p style="font-size:13px;color:#888;text-align:center">No profiles yet</p>';return;}
+  grid.innerHTML='';
+  profiles.forEach(p=>{
+    const[bg,fg]=avatarColors(p.name);
+    const top=onlineLB.filter(e=>e.user===p.name&&e.mode!=='Streak').reduce((m,e)=>Math.max(m,e.score),0);
+    const bestStreak=onlineLB.filter(e=>e.user===p.name&&e.mode==='Streak').reduce((m,e)=>Math.max(m,e.score),0);
+    const card=document.createElement('div');card.className='profile-card'+(currentProfile===p.name?' selected':'');card.onclick=()=>loginAs(p.name);
+    card.innerHTML=`<div class="profile-avatar" style="background:${bg};color:${fg}">${initials(p.name)}</div><div><div class="profile-name">${p.name}</div><div class="profile-meta">${top>0?'Best: '+top+' pts':'No scores yet'}${bestStreak>0?' · 🔥'+bestStreak:''}</div></div><div class="profile-delete" onclick="deleteProfile('${p.name.replace(/'/g,"\\'")}',event)">×</div>`;
     grid.appendChild(card);
   });
 }
-function saveScore(score, mode) { if (score <= 0 || !currentProfile) return; pushScore({ user: currentProfile, score, mode, date: new Date().toLocaleDateString() }); }
-function saveStreak(streak) {
-  if (streak <= 0 || !currentProfile) return;
-  const existing = onlineLB.filter(e => e.user === currentProfile && e.mode === 'Streak').reduce((m, e) => Math.max(m, e.score), 0);
-  if (streak > existing) pushScore({ user: currentProfile, score: streak, mode: 'Streak', date: new Date().toLocaleDateString() });
+function saveScore(score,mode){if(score<=0||!currentProfile)return;pushScore({user:currentProfile,score,mode,date:new Date().toLocaleDateString()});}
+function saveStreak(streak){
+  if(streak<=0||!currentProfile)return;
+  const existing=onlineLB.filter(e=>e.user===currentProfile&&e.mode==='Streak').reduce((m,e)=>Math.max(m,e.score),0);
+  if(streak>existing)pushScore({user:currentProfile,score:streak,mode:'Streak',date:new Date().toLocaleDateString()});
 }
  
-// ── UTILS ─────────────────────────────────────────────────────────────────────
-const DISCS = { S: 'Singles', SJ: 'Jr. Singles', P: 'Pairs', D: 'Ice Dance' };
-const DISC_CLS = { S: 'disc-singles', SJ: 'disc-junior', P: 'disc-pairs', D: 'disc-dance' };
-function discBadge(d) { return `<span class="q-disc ${DISC_CLS[d]}">${DISCS[d] || d}</span>`; }
-const allSkaters = [
+const DISCS={S:'Singles',SJ:'Jr. Singles',P:'Pairs',D:'Ice Dance'};
+const DISC_CLS={S:'disc-singles',SJ:'disc-junior',P:'disc-pairs',D:'disc-dance'};
+function discBadge(d){return`<span class="q-disc ${DISC_CLS[d]}">${DISCS[d]||d}</span>`;}
+ 
+// ── SKATER FACTS — shown after every answer ───────────────────────────────────
+const SKATER_FACTS={
+  "Ilia Malinin":"Malinin holds the men's singles world record of 333.81 and was the first to land a quad Axel in competition (2022).",
+  "Yuma Kagiyama":"Kagiyama won silver at the 2022 Beijing Olympics and is one of Japan's most decorated men's singles skaters.",
+  "Shun Sato":"Sato is a Japanese men's singles skater and 2022 World Championship bronze medalist.",
+  "Mikhail Shaidorov":"Shaidorov is Kazakhstan's top men's singles skater and a consistent Grand Prix competitor.",
+  "Daniel Grassl":"Grassl is an Italian skater known for his quad flip, one of the more difficult quad jumps.",
+  "Stephen Gogolev":"Gogolev is a Canadian skater renowned for his technical jumping ability and multiple quad variations.",
+  "Adam Siao Him Fa":"Siao Him Fa is France's top men's singles skater and a World Championship medalist.",
+  "Junhwan Cha":"Cha is South Korea's leading men's singles skater and a World Championship silver medalist.",
+  "Kao Miura":"Miura is a Japanese men's singles skater who burst onto the senior scene with strong quad content.",
+  "Nika Egadze":"Egadze is Georgia's top men's singles skater and a regular Grand Prix finalist.",
+  "Petr Gumennik":"Gumennik represents Russia and is known for his powerful free skate performances.",
+  "Aleksandr Selevko":"Selevko is Estonia's top men's singles skater and a European Championships competitor.",
+  "Sota Yamamoto":"Yamamoto is a Japanese men's singles skater and a regular World Championship competitor.",
+  "Kevin Aymoz":"Aymoz is France's veteran men's singles skater, known for his artistic and expressive programs.",
+  "Kazuki Tomono":"Tomono is a Japanese skater known for his artistic programs and consistent quad content.",
+  "Nikolaj Memola":"Memola is an Italian skater who rose quickly through the Grand Prix circuit with impressive quad jumps.",
+  "Andrew Torgashev":"Torgashev is an American men's singles skater and Grand Prix circuit competitor.",
+  "Boyang Jin":"Jin is China's top men's singles skater, renowned for his powerful quad Lutz.",
+  "Jason Brown":"Brown is an American skater celebrated for exceptional skating skills and artistry at the elite level without regular quad jumps.",
+  "Matteo Rizzo":"Rizzo is Italy's veteran men's singles skater and a consistent European Championships competitor.",
+  "Lukas Britschgi":"Britschgi is Switzerland's top men's singles skater and a regular European Championships competitor.",
+  "Tomoki Hiwatashi":"Hiwatashi is an American skater known for his elegant style and technical consistency.",
+  "Roman Sadovsky":"Sadovsky is a Canadian men's singles skater who competes on the ISU Grand Prix circuit.",
+  "Kaori Sakamoto":"Sakamoto is Japan's legendary women's singles skater and four-time World Champion (2022, 2023, 2024, 2026).",
+  "Mone Chiba":"Chiba is one of Japan's leading women's singles skaters and a World Championship medalist.",
+  "Alysa Liu":"Liu is an American skater who won the 2025 and 2026 World Championships, ending Sakamoto's three-year streak.",
+  "Yuna Aoki":"Aoki is a Japanese women's singles skater and ISU Grand Prix circuit competitor.",
+  "Niina Petrokina":"Petrokina is Estonia's top women's singles skater and a regular European Championships competitor.",
+  "Amber Glenn":"Glenn is a three-time US national champion known for her triple Axel and expressive skating.",
+  "Isabeau Levito":"Levito is a rising American star, 2024 World Championship silver medalist, known for her difficult jump combinations.",
+  "Haein Lee":"Lee is a South Korean skater and World Championship silver medalist.",
+  "Loena Hendrickx":"Hendrickx is Belgium's top women's skater and 2022 World Championship silver medalist.",
+  "Bradie Tennell":"Tennell is an American women's skater who competed at the 2022 Beijing Olympics.",
+  "Young You":"You is a South Korean women's singles skater and Grand Prix circuit competitor.",
+  "Starr Andrews":"Andrews is an American skater known for her dynamic, expressive free skate programs.",
+  "Mao Shimada":"Shimada is a Japanese junior skater considered one of the sport's brightest prospects, with senior appearances.",
+  "Rio Nakata":"Nakata is a Japanese junior men's skater with one of the highest junior PB scores in the dataset.",
+  "Minkyu Seo":"Seo is a South Korean junior men's skater and Junior Grand Prix competitor.",
+  "Taiga Nishino":"Nishino is a Japanese junior men's skater on the Junior Grand Prix circuit.",
+  "Hana Bath":"Bath is Australia's top junior skater and one of very few elite figure skaters from Australia.",
+  "Mei Okada":"Okada is a Japanese junior women's skater and Junior Grand Prix competitor.",
+  "Wenjing Sui / Cong Han":"Sui and Han are China's premier pairs team, two-time World Champions and 2022 Olympic gold medalists.",
+  "Alexa Knierim / Brandon Frazier":"Knierim and Frazier are the USA's top pairs team and 2022 World Championship silver medalists.",
+  "Anastasia Mishina / Aleksandr Galliamov":"Mishina and Galliamov are Russian pairs skaters and 2021 World Champions.",
+  "Riku Miura / Ryuichi Kihara":"Miura and Kihara are Japan's top pairs team and 2022 World Championship silver medalists.",
+  "Xiaoyu Chen / Hao Yang":"Chen and Yang are one of China's leading pairs teams and a consistent World Championship podium presence.",
+  "Deanna Stellato-Dudek / Maxime Deschamps":"Stellato-Dudek and Deschamps are Canada's top pairs team, notable for Stellato-Dudek returning to elite competition in her 40s.",
+  "Evgenia Tarasova / Vladimir Morozov":"Tarasova and Morozov are one of Russia's leading pairs teams and multiple World Championship medalists.",
+  "Cheng Peng / Yang Jin":"Peng and Jin are one of China's top pairs teams and consistent World Championship competitors.",
+  "Annika Hocke / Robert Kunkel":"Hocke and Kunkel are a German pairs team and regular European Championships competitors.",
+  "Minerva Hase / Nolan Seegert":"Hase and Seegert are Germany's top pairs team and consistent European Championships competitors.",
+  "Madison Chock / Evan Bates":"Chock and Bates are one of the USA's top ice dance teams, competing at multiple Olympic Games.",
+  "Gabriella Papadakis / Guillaume Cizeron":"Papadakis and Cizeron are France's legendary ice dance team and 2022 Olympic gold medalists with a world record total of 229.82.",
+  "Victoria Sinitsina / Nikita Katsalapov":"Sinitsina and Katsalapov are Russian ice dancers and 2021 World Champions.",
+  "Charlene Guignard / Marco Fabbri":"Guignard and Fabbri are Italy's top ice dance team and multiple European Championship medalists.",
+  "Piper Gilles / Paul Poirier":"Gilles and Poirier are a Canadian ice dance team known for their creative and theatrical programs.",
+  "Lilah Fear / Lewis Gibson":"Fear and Gibson are Great Britain's top ice dance team and European Championship medalists.",
+  "Laurence Fournier Beaudry / Nikolaj Soerensen":"Fournier Beaudry and Soerensen are a French ice dance team formed for the 2025-26 season.",
+  "Marjorie Lajoie / Zachary Lagha":"Lajoie and Lagha are one of Canada's strong ice dance teams and regular Grand Prix competitors.",
+  "Kaitlin Hawayek / Jean-Luc Baker":"Hawayek and Baker are an American ice dance team with years of Grand Prix experience.",
+  "Shiyue Wang / Xinyu Liu":"Wang and Liu are China's top ice dance team and consistent World Championship competitors.",
+  "Elizaveta Khudaiberdieva / Egor Bazin":"Khudaiberdieva and Bazin are a Russian ice dance team and regular Grand Prix competitors."
+};
+function skaterFact(name){return SKATER_FACTS[name]||('PB: '+name);}
+function showExp(id,correct,text){
+  const el=document.getElementById(id);el.className='answer-exp '+(correct?'ok':'bad');
+  el.textContent=(correct?'✓ ':'✗ ')+text;el.style.display='block';
+}
+function hideExp(id){const el=document.getElementById(id);if(el){el.style.display='none';const btn=el.querySelector('.ok-btn');if(btn)btn.remove();}}
+function okBtn(nextFn, containerId){
+  const container = document.getElementById(containerId);
+  if(!container) { setTimeout(nextFn, 0); return; }
+  const existing = container.querySelector('.ok-btn');
+  if(existing) existing.remove();
+  const b = document.createElement('button');
+  b.className = 'btn ok-btn';
+  b.style.cssText = 'margin-top:10px;padding:8px 20px;font-size:12px;display:block;';
+  b.textContent = 'OK →';
+  b.onclick = () => nextFn();
+  container.appendChild(b);
+}
+ 
+ 
+const allSkaters=[
   ["Ilia Malinin",333.81,"USA","S"],["Yuma Kagiyama",306.67,"Japan","S"],["Shun Sato",292.08,"Japan","S"],
   ["Mikhail Shaidorov",291.58,"Kazakhstan","S"],["Daniel Grassl",288.72,"Italy","S"],["Stephen Gogolev",281.04,"Canada","S"],
   ["Adam Siao Him Fa",280.95,"France","S"],["Junhwan Cha",273.92,"Korea","S"],["Kao Miura",273.73,"Japan","S"],
@@ -450,173 +541,348 @@ const allSkaters = [
   ["Elizaveta Khudaiberdieva / Egor Bazin",214.90,"Russia","D"],
 ];
  
-let globalStreak = 0;
-function updateGlobal(won) { if (won) { globalStreak++; } else { if (globalStreak > 0) saveStreak(globalStreak); globalStreak = 0; } document.getElementById('globalStreakDisplay').textContent = globalStreak; }
-function switchTab(id, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(id).classList.add('active'); el.classList.add('active');
-  if (id === 'leader') fetchLB();
-  if (id === 'tf' && tfCurrent === null) initTF();
-  if (id === 'hl') newHL(); if (id === 'podium') newPodium(); if (id === 'missing') newMissing(); if (id === 'speed') newSpeed();
+let globalStreak=0;
+function updateGlobal(won){if(won){globalStreak++;}else{if(globalStreak>0)saveStreak(globalStreak);globalStreak=0;}document.getElementById('globalStreakDisplay').textContent=globalStreak;}
+function switchTab(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');el.classList.add('active');
+  if(id==='leader')fetchLB();if(id==='tf'&&tfCurrent===null)initTF();
+  if(id==='hl')newHL();if(id==='podium')newPodium();if(id==='missing')newMissing();if(id==='speed')newSpeed();
+  if(id==='career')newCareer();
 }
-function pick(pool) { return pool[Math.random() * pool.length | 0]; }
-function rand4(ans, pool) { let o = [ans]; while (o.length < 4) { let r = pick(pool); if (!o.includes(r)) o.push(r); } return o.sort(() => Math.random() - 0.5); }
-function flash(txt) { let d = document.createElement('div'); d.className = 'flash'; d.textContent = txt; document.body.appendChild(d); setTimeout(() => d.remove(), 700); }
-function shuffleArr(a) { for (let i = a.length - 1; i > 0; i--) { let j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } }
-function pickDistinct(n) { const copy = [...allSkaters]; shuffleArr(copy); return copy.slice(0, n); }
-function resetAllGames() {
-  globalStreak = 0; document.getElementById('globalStreakDisplay').textContent = 0;
-  eStreak = 0; document.getElementById('eStreak').textContent = 0; newEasy();
-  hScore = 0; document.getElementById('hStreakDisplay').textContent = 0; newHard();
-  cStreak = 0; document.getElementById('cStreak').textContent = 0; newCountry();
-  newWordle(); tfCurrent = null; hlStreak = 0; podiumScore = 0; missingStreak = 0;
+function pick(pool){return pool[Math.random()*pool.length|0];}
+function rand4(ans,pool){let o=[ans];while(o.length<4){let r=pick(pool);if(!o.includes(r))o.push(r);}return o.sort(()=>Math.random()-0.5);}
+function flash(txt){let d=document.createElement('div');d.className='flash';d.textContent=txt;document.body.appendChild(d);setTimeout(()=>d.remove(),700);}
+function shuffleArr(a){for(let i=a.length-1;i>0;i--){let j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}}
+function pickDistinct(n){const copy=[...allSkaters];shuffleArr(copy);return copy.slice(0,n);}
+function resetAllGames(){
+  globalStreak=0;document.getElementById('globalStreakDisplay').textContent=0;
+  eStreak=0;document.getElementById('eStreak').textContent=0;newEasy();
+  hScore=0;document.getElementById('hStreakDisplay').textContent=0;newHard();
+  cStreak=0;document.getElementById('cStreak').textContent=0;newCountry();
+  newWordle();tfCurrent=null;hlStreak=0;podiumScore=0;missingStreak=0;careerInited=false;
   document.querySelectorAll('.tab')[0].click();
 }
  
-let eAns, eStreak = 0;
-function newEasy() {
-  eAns = pick(allSkaters); document.getElementById('eScore').textContent = eAns[1]; document.getElementById('eSub').textContent = eAns[2]; document.getElementById('eDisc').innerHTML = discBadge(eAns[3]);
-  let opts = rand4(eAns, allSkaters), box = document.getElementById('eChoices'); box.innerHTML = '';
-  opts.forEach(o => { let b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = o[0]; b.onclick = () => { box.querySelectorAll('button').forEach(x => x.onclick = null); if (o === eAns) { b.classList.add('correct'); eStreak++; updateGlobal(true); document.getElementById('eStreak').textContent = eStreak; flash('✓ +1'); } else { b.classList.add('wrong'); box.querySelectorAll('button').forEach(x => { if (x.textContent === eAns[0]) x.classList.add('correct'); }); saveScore(eStreak, 'Easy'); eStreak = 0; document.getElementById('eStreak').textContent = 0; updateGlobal(false); flash('✗'); } setTimeout(newEasy, 700); }; box.appendChild(b); });
+// EASY
+let eAns,eStreak=0;
+function newEasy(){
+  hideExp('eExp');
+  eAns=pick(allSkaters);document.getElementById('eScore').textContent=eAns[1];document.getElementById('eSub').textContent=eAns[2];document.getElementById('eDisc').innerHTML=discBadge(eAns[3]);
+  let opts=rand4(eAns,allSkaters),box=document.getElementById('eChoices');box.innerHTML='';
+  opts.forEach(o=>{let b=document.createElement('button');b.className='choice-btn';b.textContent=o[0];
+    b.onclick=()=>{
+      box.querySelectorAll('button').forEach(x=>x.onclick=null);
+      const correct=o===eAns;
+      if(correct){b.classList.add('correct');eStreak++;updateGlobal(true);document.getElementById('eStreak').textContent=eStreak;flash('✓ +1');}
+      else{b.classList.add('wrong');box.querySelectorAll('button').forEach(x=>{if(x.textContent===eAns[0])x.classList.add('correct');});saveScore(eStreak,'Easy');eStreak=0;document.getElementById('eStreak').textContent=0;updateGlobal(false);flash('✗');}
+      showExp('eExp',correct,skaterFact(eAns[0]));okBtn(newEasy,'eExp');
+    };box.appendChild(b);});
 }
  
-let hAns, hScore = 0;
-function newHard() { hAns = pick(allSkaters); document.getElementById('hScore').textContent = hAns[1]; document.getElementById('hSub').innerHTML = hAns[2] + ' · ' + DISCS[hAns[3]]; document.getElementById('hMsg').style.display = 'none'; document.getElementById('hInput').value = ''; }
-function checkHard() {
-  let v = document.getElementById('hInput').value.trim(); if (!v) return; let m = document.getElementById('hMsg'); m.style.display = 'block';
-  if (hAns[0].toLowerCase().includes(v.toLowerCase())) { hScore += 2; flash('✓ +2'); m.textContent = 'Correct! ' + hAns[0]; document.getElementById('hStreakDisplay').textContent = hScore; updateGlobal(true); }
-  else { m.textContent = 'Wrong — ' + hAns[0]; saveScore(hScore, 'Hard'); hScore = 0; document.getElementById('hStreakDisplay').textContent = 0; updateGlobal(false); flash('✗'); }
-  setTimeout(newHard, 900);
+// HARD
+let hAns,hScore=0;
+function newHard(){hideExp('hExp');hAns=pick(allSkaters);document.getElementById('hScore').textContent=hAns[1];document.getElementById('hSub').innerHTML=hAns[2]+' · '+DISCS[hAns[3]];document.getElementById('hMsg').style.display='none';document.getElementById('hInput').value='';}
+function checkHard(){
+  let v=document.getElementById('hInput').value.trim();if(!v)return;
+  const correct=hAns[0].toLowerCase().includes(v.toLowerCase());
+  let m=document.getElementById('hMsg');m.style.display='block';
+  if(correct){hScore+=2;flash('✓ +2');m.textContent='Correct! '+hAns[0];document.getElementById('hStreakDisplay').textContent=hScore;updateGlobal(true);}
+  else{m.textContent='Wrong — answer was '+hAns[0];saveScore(hScore,'Hard');hScore=0;document.getElementById('hStreakDisplay').textContent=0;updateGlobal(false);flash('✗');}
+  showExp('hExp',correct,skaterFact(hAns[0]));okBtn(newHard,'hExp');
 }
  
-let cAns, cStreak = 0;
-function newCountry() {
-  cAns = pick(allSkaters); document.getElementById('cName').textContent = cAns[0]; document.getElementById('cSub').textContent = 'PB: ' + cAns[1]; document.getElementById('cDisc').innerHTML = discBadge(cAns[3]);
-  let countries = [...new Set(allSkaters.map(s => s[2]))], opts = [cAns[2]];
-  while (opts.length < 4) { let r = countries[Math.random() * countries.length | 0]; if (!opts.includes(r)) opts.push(r); } opts.sort(() => Math.random() - 0.5);
-  let box = document.getElementById('cChoices'); box.innerHTML = '';
-  opts.forEach(o => { let b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = o; b.onclick = () => { box.querySelectorAll('button').forEach(x => x.onclick = null); if (o === cAns[2]) { b.classList.add('correct'); cStreak++; updateGlobal(true); document.getElementById('cStreak').textContent = cStreak; flash('✓'); } else { b.classList.add('wrong'); box.querySelectorAll('button').forEach(x => { if (x.textContent === cAns[2]) x.classList.add('correct'); }); saveScore(cStreak, 'Country'); cStreak = 0; document.getElementById('cStreak').textContent = 0; updateGlobal(false); flash('✗'); } setTimeout(newCountry, 700); }; box.appendChild(b); });
+// COUNTRY
+let cAns,cStreak=0;
+function newCountry(){
+  hideExp('cExp');
+  cAns=pick(allSkaters);document.getElementById('cName').textContent=cAns[0];document.getElementById('cSub').textContent='PB: '+cAns[1];document.getElementById('cDisc').innerHTML=discBadge(cAns[3]);
+  let countries=[...new Set(allSkaters.map(s=>s[2]))],opts=[cAns[2]];
+  while(opts.length<4){let r=countries[Math.random()*countries.length|0];if(!opts.includes(r))opts.push(r);}opts.sort(()=>Math.random()-0.5);
+  let box=document.getElementById('cChoices');box.innerHTML='';
+  opts.forEach(o=>{let b=document.createElement('button');b.className='choice-btn';b.textContent=o;
+    b.onclick=()=>{
+      box.querySelectorAll('button').forEach(x=>x.onclick=null);
+      const correct=o===cAns[2];
+      if(correct){b.classList.add('correct');cStreak++;updateGlobal(true);document.getElementById('cStreak').textContent=cStreak;flash('✓');}
+      else{b.classList.add('wrong');box.querySelectorAll('button').forEach(x=>{if(x.textContent===cAns[2])x.classList.add('correct');});saveScore(cStreak,'Country');cStreak=0;document.getElementById('cStreak').textContent=0;updateGlobal(false);flash('✗');}
+      showExp('cExp',correct,skaterFact(cAns[0]));okBtn(newCountry,'cExp');
+    };box.appendChild(b);});
 }
  
-let tAns, tScore = 0, tTime = 30, tIntv = null, tRunning = false;
-const ARC = 150.8;
-function updateArc() { let pct = Math.max(tTime, 0) / 30; document.getElementById('timerArc').style.strokeDashoffset = ARC * (1 - pct); document.getElementById('tTimeSec').textContent = Math.max(tTime, 0); document.getElementById('timerArc').style.stroke = tTime > 10 ? '#4fc3f7' : tTime > 5 ? '#ffd54f' : '#ef5350'; }
-function startTimer() {
-  clearInterval(tIntv); tScore = 0; tTime = 30; tRunning = true; document.getElementById('tScoreDisplay').textContent = 0; document.getElementById('tCard').style.display = 'block'; updateArc(); newTimerQ();
-  tIntv = setInterval(() => { tTime--; updateArc(); if (tTime <= 0) { clearInterval(tIntv); tRunning = false; saveScore(tScore, 'Timer'); document.getElementById('tCard').style.display = 'none'; document.getElementById('tChoices').innerHTML = '<p style="font-size:14px;color:#888;padding:1rem 0">Time up! Score: ' + tScore + '</p>'; } }, 1000);
+// TIMER
+let tAns,tScore=0,tTime=30,tIntv=null,tRunning=false;
+const ARC=150.8;
+function updateArc(){let pct=Math.max(tTime,0)/30;document.getElementById('timerArc').style.strokeDashoffset=ARC*(1-pct);document.getElementById('tTimeSec').textContent=Math.max(tTime,0);document.getElementById('timerArc').style.stroke=tTime>10?'#4fc3f7':tTime>5?'#ffd54f':'#ef5350';}
+function startTimer(){
+  clearInterval(tIntv);tScore=0;tTime=30;tRunning=true;document.getElementById('tScoreDisplay').textContent=0;document.getElementById('tCard').style.display='block';hideExp('tExp');updateArc();newTimerQ();
+  tIntv=setInterval(()=>{tTime--;updateArc();if(tTime<=0){clearInterval(tIntv);tRunning=false;saveScore(tScore,'Timer');document.getElementById('tCard').style.display='none';document.getElementById('tChoices').innerHTML='<p style="font-size:14px;color:#888;padding:1rem 0">Time up! Score: '+tScore+'</p>';}},1000);
 }
-function newTimerQ() {
-  if (!tRunning) return; tAns = pick(allSkaters); document.getElementById('tScore').textContent = tAns[1]; document.getElementById('tSub').innerHTML = DISCS[tAns[3]];
-  let opts = rand4(tAns, allSkaters), box = document.getElementById('tChoices'); box.innerHTML = '';
-  opts.forEach(o => { let b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = o[0]; b.onclick = () => { if (!tRunning) return; box.querySelectorAll('button').forEach(x => x.onclick = null); if (o === tAns) { b.classList.add('correct'); tScore++; document.getElementById('tScoreDisplay').textContent = tScore; flash('⚡'); } else { b.classList.add('wrong'); tTime = Math.max(0, tTime - 2); updateArc(); } setTimeout(newTimerQ, 400); }; box.appendChild(b); });
-}
- 
-let wAns, wAttempts = 0;
-function newWordle() { wAns = pick(allSkaters); wAttempts = 0; document.getElementById('wHistory').innerHTML = ''; document.getElementById('wInput').value = ''; renderHints(); }
-function renderHints() {
-  let h = { Country: wAns[2], Discipline: DISCS[wAns[3]] };
-  if (wAttempts >= 1) h['PB'] = wAns[1]; if (wAttempts >= 2) h['First letter'] = wAns[0][0]; if (wAttempts >= 3) h['Last letter'] = wAns[0].slice(-1); if (wAttempts >= 4) h['Name length'] = wAns[0].length; if (wAttempts >= 5) h['First word'] = wAns[0].split(' ')[0].length + ' letters';
-  document.getElementById('wHints').innerHTML = Object.entries(h).map(([k, v]) => `<div class="hint-item"><span style="display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">${k}</span><b>${v}</b></div>`).join('');
-  document.getElementById('wAttempts').textContent = 'Attempt ' + wAttempts + ' / 6';
-}
-function checkWordle() {
-  let v = document.getElementById('wInput').value.trim(); if (!v) return; wAttempts++; let ok = v.toLowerCase() === wAns[0].toLowerCase();
-  let row = document.createElement('div'); row.className = 'wordle-row ' + (ok ? 'correct' : 'wrong'); row.textContent = (ok ? '✓ ' : '✗ ') + v; document.getElementById('wHistory').appendChild(row); renderHints();
-  if (ok) { flash('🎯'); setTimeout(newWordle, 1200); } else if (wAttempts >= 6) { alert('Answer: ' + wAns[0]); newWordle(); }
-  document.getElementById('wInput').value = '';
+function newTimerQ(){
+  if(!tRunning)return;hideExp('tExp');tAns=pick(allSkaters);document.getElementById('tScore').textContent=tAns[1];document.getElementById('tSub').innerHTML=DISCS[tAns[3]];
+  let opts=rand4(tAns,allSkaters),box=document.getElementById('tChoices');box.innerHTML='';
+  opts.forEach(o=>{let b=document.createElement('button');b.className='choice-btn';b.textContent=o[0];
+    b.onclick=()=>{
+      if(!tRunning)return;box.querySelectorAll('button').forEach(x=>x.onclick=null);
+      const correct=o===tAns;
+      if(correct){b.classList.add('correct');tScore++;document.getElementById('tScoreDisplay').textContent=tScore;flash('⚡');}
+      else{b.classList.add('wrong');tTime=Math.max(0,tTime-2);updateArc();}
+      showExp('tExp',correct,skaterFact(tAns[0]));setTimeout(newTimerQ,1400);
+    };box.appendChild(b);});
 }
  
-const CAT_STYLES = { 'Personal Best': 'cat-pb', 'World Record': 'cat-wr', 'Country': 'cat-country', 'Discipline': 'cat-disc', 'Rules': 'cat-rules', 'Score Comparison': 'cat-compare' };
-let tfBank = [], tfUsed = [], tfScoreVal = 0, tfLives = 3, tfLocked = false, tfCurrent = null;
-function buildTFBank() { return [{ s: "Ilia Malinin holds the world record for Men's Singles total score.", a: true, e: "Malinin set the world record of 333.81.", c: "World Record" }, { s: "The men's singles world record is above 340 points.", a: false, e: "Malinin's world record is 333.81, below 340.", c: "World Record" }, { s: "Papadakis and Cizeron hold the Ice Dance world record.", a: true, e: "Their 229.82 at Beijing 2022 is the Ice Dance world record.", c: "World Record" }, { s: "The women's singles world record is above 260 points.", a: false, e: "The record is 255.95, set by Alysa Liu in 2019.", c: "World Record" }, { s: "Sui and Han hold the Pairs world record.", a: true, e: "Their 239.88 at Beijing 2022 is the Pairs world record.", c: "World Record" }, { s: "Malinin was the first to land a quad Axel in competition.", a: true, e: "He did so at the 2022 US International Classic.", c: "World Record" }, { s: "Multiple skaters have landed the quad Axel in ISU competition.", a: false, e: "Only Malinin has done so as of 2024.", c: "World Record" }, { s: "Nathan Chen's men's singles world record exceeded 320 points.", a: true, e: "Chen's record was 320.88 at Beijing 2022.", c: "World Record" }, { s: "Hanyu was the first man to break 300 points.", a: true, e: "He did so at the 2015 Grand Prix Final.", c: "World Record" }, { s: "Malinin's PB is above 330 points.", a: true, e: "His PB is 333.81.", c: "Personal Best" }, { s: "Kagiyama's PB is above 310 points.", a: false, e: "His PB is 306.67.", c: "Personal Best" }, { s: "Sakamoto's PB is above 240 points.", a: false, e: "Her PB is 238.28.", c: "Personal Best" }, { s: "Papadakis/Cizeron's PB is above 225 points.", a: true, e: "Their PB is 229.82.", c: "Personal Best" }, { s: "Sui/Han's PB is higher than Chock/Bates's.", a: true, e: "234.84 vs 222.17.", c: "Personal Best" }, { s: "Sato's PB is higher than Shaidorov's.", a: true, e: "292.08 vs 291.58.", c: "Personal Best" }, { s: "Hendrickx's PB is above 210 points.", a: false, e: "Her PB is 204.96.", c: "Personal Best" }, { s: "Jason Brown's PB is above 260 points.", a: false, e: "His PB is 257.81.", c: "Personal Best" }, { s: "The top ice dance PB beats the top pairs PB.", a: false, e: "Ice dance top: 229.82. Pairs top: 234.84.", c: "Score Comparison" }, { s: "The gap between Malinin's and Kagiyama's PBs is more than 30 points.", a: false, e: "The gap is 27.14 points.", c: "Score Comparison" }, { s: "Miura's PB is within 1 point of Cha's.", a: true, e: "273.73 vs 273.92 — only 0.19 apart.", c: "Score Comparison" }, { s: "Boyang Jin's PB is higher than Jason Brown's.", a: true, e: "258.86 vs 257.81.", c: "Score Comparison" }, { s: "Papadakis and Cizeron are from Italy.", a: false, e: "They represent France.", c: "Country" }, { s: "Kaori Sakamoto represents Japan.", a: true, e: "She is a three-time World Champion for Japan.", c: "Country" }, { s: "Jason Brown represents Canada.", a: false, e: "He competes for the USA.", c: "Country" }, { s: "Donovan Carrillo represents Mexico.", a: true, e: "He is Mexico's top skater.", c: "Country" }, { s: "Kevin Aymoz represents Switzerland.", a: false, e: "He skates for France.", c: "Country" }, { s: "Chock and Bates are a Pairs team.", a: false, e: "They are an Ice Dance team.", c: "Discipline" }, { s: "Sui and Han compete in Pairs skating.", a: true, e: "They are China's top Pairs team.", c: "Discipline" }, { s: "Ice dance teams perform throw jumps.", a: false, e: "Throw jumps are a Pairs element.", c: "Discipline" }, { s: "A quad Axel has a higher base value than a quad Lutz.", a: true, e: "4A: 12.50, 4Lz: 11.50.", c: "Rules" }, { s: "A triple Axel has 3.5 rotations.", a: true, e: "The Axel's forward takeoff adds half a rotation.", c: "Rules" }, { s: "The short program is always skated before the free skate.", a: true, e: "All ISU events go: short program, then free skate.", c: "Rules" }].map(q => ({ statement: q.s, answer: q.a, explanation: q.e, category: q.c })); }
-function initTF() { tfBank = buildTFBank(); shuffleArr(tfBank); tfUsed = []; tfScoreVal = 0; tfLives = 3; tfLocked = false; document.getElementById('tfScore').textContent = 0; renderLives(); renderTFProgress(); nextTF(); }
-function renderLives() { const el = document.getElementById('tfLives'); el.innerHTML = ''; for (let i = 0; i < 3; i++) { const s = document.createElement('span'); s.className = 'tf-life'; s.textContent = i < tfLives ? '❤️' : '🖤'; el.appendChild(s); } }
-function renderTFProgress() { const el = document.getElementById('tfProgress'); el.innerHTML = ''; tfUsed.forEach(r => { const d = document.createElement('div'); d.className = 'tf-dot ' + (r ? 'c' : 'w'); el.appendChild(d); }); }
-function nextTF() { if (!tfBank.length) { tfBank = buildTFBank(); shuffleArr(tfBank); } tfCurrent = tfBank.pop(); tfLocked = false; document.getElementById('tfStatement').textContent = tfCurrent.statement; document.getElementById('tfCatPill').innerHTML = `<span class="cat-pill ${CAT_STYLES[tfCurrent.category] || 'cat-rules'}">${tfCurrent.category}</span>`; document.getElementById('tfExplanation').style.display = 'none'; document.getElementById('tfTrue').className = 'tf-btn true-btn'; document.getElementById('tfFalse').className = 'tf-btn false-btn'; }
-function answerTF(userAnswer) {
-  if (tfLocked) return; tfLocked = true; const correct = userAnswer === tfCurrent.answer;
-  const tBtn = document.getElementById('tfTrue'), fBtn = document.getElementById('tfFalse'), expEl = document.getElementById('tfExplanation');
-  if (correct) { (userAnswer ? tBtn : fBtn).classList.add('correct'); tfScoreVal++; document.getElementById('tfScore').textContent = tfScoreVal; flash('✓ +1'); updateGlobal(true); tfUsed.push(true); }
-  else { (userAnswer ? tBtn : fBtn).classList.add('wrong'); (tfCurrent.answer ? tBtn : fBtn).classList.add('correct'); tfLives--; renderLives(); flash('✗'); updateGlobal(false); tfUsed.push(false); if (tfLives <= 0) { saveScore(tfScoreVal, 'True/False'); expEl.style.display = 'block'; expEl.innerHTML = '<b>Game over!</b> ' + tfCurrent.explanation + '<br><br><button class="btn" style="margin-top:8px;padding:8px 16px;font-size:12px" onclick="initTF()">Play again</button>'; renderTFProgress(); return; } }
-  expEl.style.display = 'block'; expEl.textContent = tfCurrent.explanation; renderTFProgress(); setTimeout(nextTF, 1600);
+// WORDLE
+let wAns,wAttempts=0;
+function newWordle(){wAns=pick(allSkaters);wAttempts=0;document.getElementById('wHistory').innerHTML='';document.getElementById('wInput').value='';renderHints();}
+function renderHints(){
+  let h={Country:wAns[2],Discipline:DISCS[wAns[3]]};
+  if(wAttempts>=1)h['PB']=wAns[1];if(wAttempts>=2)h['First letter']=wAns[0][0];if(wAttempts>=3)h['Last letter']=wAns[0].slice(-1);if(wAttempts>=4)h['Name length']=wAns[0].length;if(wAttempts>=5)h['First word']=wAns[0].split(' ')[0].length+' letters';
+  document.getElementById('wHints').innerHTML=Object.entries(h).map(([k,v])=>`<div class="hint-item"><span style="display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px">${k}</span><b>${v}</b></div>`).join('');
+  document.getElementById('wAttempts').textContent='Attempt '+wAttempts+' / 6';
+}
+function checkWordle(){
+  let v=document.getElementById('wInput').value.trim();if(!v)return;wAttempts++;let ok=v.toLowerCase()===wAns[0].toLowerCase();
+  let row=document.createElement('div');row.className='wordle-row '+(ok?'correct':'wrong');
+  row.textContent=(ok?'✓ ':'✗ ')+v;
+  if(ok){row.title=skaterFact(wAns[0]);}
+  document.getElementById('wHistory').appendChild(row);renderHints();
+  if(ok){
+    const factRow=document.createElement('div');factRow.style.cssText='font-size:12px;color:#2e7d32;padding:8px 12px;background:#e8f5e9;border-radius:8px;margin-top:4px;';
+    factRow.textContent=skaterFact(wAns[0]);document.getElementById('wHistory').appendChild(factRow);
+    flash('🎯');okBtn(newWordle,'wOkHolder');
+  }else if(wAttempts>=6){
+    const factRow=document.createElement('div');factRow.style.cssText='font-size:12px;color:#c62828;padding:8px 12px;background:#ffebee;border-radius:8px;margin-top:4px;';
+    factRow.textContent='Answer: '+wAns[0]+'. '+skaterFact(wAns[0]);const woh=document.getElementById('wOkHolder');woh.innerHTML='';document.getElementById('wHistory').appendChild(factRow);okBtn(newWordle,'wOkHolder');
+  }
+  document.getElementById('wInput').value='';
 }
  
-let hlLeft, hlRight, hlStreak = 0, hlLocked = false;
-function newHL() {
-  hlLocked = false; [hlLeft, hlRight] = pickDistinct(2);
-  document.getElementById('hlLeftName').textContent = hlLeft[0]; document.getElementById('hlLeftDisc').innerHTML = discBadge(hlLeft[3]); document.getElementById('hlLeftScore').textContent = hlLeft[1];
-  document.getElementById('hlRightName').textContent = hlRight[0]; document.getElementById('hlRightDisc').innerHTML = discBadge(hlRight[3]); document.getElementById('hlRightScore').textContent = '???'; document.getElementById('hlRightScore').className = 'hl-score hidden';
-  document.getElementById('hlLeft').className = 'hl-card'; document.getElementById('hlRight').className = 'hl-card';
-  document.getElementById('hlHigherBtn').className = 'hl-btn higher'; document.getElementById('hlLowerBtn').className = 'hl-btn lower'; document.getElementById('hlMsg').style.display = 'none';
-}
-function answerHL(guess) {
-  if (hlLocked) return; hlLocked = true;
-  const correct = (guess === 'higher' && hlRight[1] > hlLeft[1]) || (guess === 'lower' && hlRight[1] < hlLeft[1]);
-  document.getElementById('hlRightScore').textContent = hlRight[1]; document.getElementById('hlRightScore').className = 'hl-score';
-  const rightCard = document.getElementById('hlRight'), chosenBtn = document.getElementById(guess === 'higher' ? 'hlHigherBtn' : 'hlLowerBtn'), m = document.getElementById('hlMsg'); m.style.display = 'block';
-  if (correct) { rightCard.classList.add('correct'); chosenBtn.classList.add('correct'); hlStreak++; updateGlobal(true); document.getElementById('hlStreak').textContent = hlStreak; flash('✓ +1'); m.textContent = hlRight[0] + ' scored ' + hlRight[1] + (hlRight[1] > hlLeft[1] ? ' — higher!' : ' — lower!'); }
-  else { rightCard.classList.add('wrong'); chosenBtn.classList.add('wrong'); saveScore(hlStreak, 'Higher/Lower'); hlStreak = 0; document.getElementById('hlStreak').textContent = 0; updateGlobal(false); flash('✗'); m.textContent = hlRight[0] + ' scored ' + hlRight[1] + (hlRight[1] > hlLeft[1] ? ' — that was higher!' : ' — that was lower!'); }
-  setTimeout(newHL, 1400);
+// TRUE/FALSE
+const CAT_STYLES={'Personal Best':'cat-pb','World Record':'cat-wr','Country':'cat-country','Discipline':'cat-disc','Rules':'cat-rules','Score Comparison':'cat-compare'};
+let tfBank=[],tfUsed=[],tfScoreVal=0,tfLives=3,tfLocked=false,tfCurrent=null;
+function buildTFBank(){return[
+  // WORLD RECORDS — all verified against Wikipedia ISU highest scores page (April 2026)
+  // Men's total WR: 335.30 Nathan Chen (2019-20 GP Final)
+  // Men's free WR: 238.24 Malinin (2025-26 GP Final)
+  // Women's total WR: 272.71 Russia (2021 Rostelecom Cup)
+  // Pairs total WR: 239.88 Sui/Han (2022 Olympics)
+  // Ice dance total WR: 232.32 Chock/Bates (2023 World Team Trophy)
+  {s:"Nathan Chen holds the men's singles world record total score.",a:true,e:"Nathan Chen set the men's world record of 335.30 at the 2019-20 Grand Prix Final. Malinin's PB of 333.81 is the second highest ever.",c:"World Record"},
+  {s:"Ilia Malinin holds the men's singles world record total score.",a:false,e:"Nathan Chen holds the men's world record at 335.30 (2019-20 GP Final). Malinin's PB of 333.81 is the second highest score ever recorded.",c:"World Record"},
+  {s:"The men's singles world record total is above 330 points.",a:true,e:"Nathan Chen's world record is 335.30, set at the 2019-20 Grand Prix Final.",c:"World Record"},
+  {s:"Ilia Malinin's personal best total score is above 330 points.",a:true,e:"Malinin's PB is 333.81, set at the 2025 Skate Canada International — the second highest men's total ever.",c:"World Record"},
+  {s:"Madison Chock and Evan Bates hold the ice dance world record.",a:true,e:"Chock and Bates set the ice dance world record of 232.32 at the 2023 World Team Trophy.",c:"World Record"},
+  {s:"Papadakis and Cizeron hold the current ice dance world record.",a:false,e:"Madison Chock and Evan Bates hold the current ice dance world record at 232.32 (2023 World Team Trophy). Papadakis/Cizeron's 229.82 is the third highest ever.",c:"World Record"},
+  {s:"The ice dance world record is above 230 points.",a:true,e:"Chock and Bates set the ice dance world record of 232.32 at the 2023 World Team Trophy.",c:"World Record"},
+  {s:"Wenjing Sui and Cong Han hold the pairs skating world record.",a:true,e:"Sui and Han's total of 239.88 at the 2022 Beijing Olympics is the pairs world record.",c:"World Record"},
+  {s:"The pairs world record total is below 240 points.",a:true,e:"Sui and Han's pairs world record is 239.88, which is just under 240.",c:"World Record"},
+  {s:"The women's singles world record total is above 270 points.",a:true,e:"The women's world record is 272.71, set at the 2021 Rostelecom Cup.",c:"World Record"},
+  {s:"The women's singles world record total is below 280 points.",a:true,e:"The women's world record is 272.71, which is below 280.",c:"World Record"},
+  {s:"Yuzuru Hanyu was the first man to break 300 points in total score.",a:true,e:"Hanyu first broke 300 points at the 2015 NHK Trophy, scoring 322.40. Note: these are historical records before the current +5/-5 scoring era.",c:"World Record"},
+  {s:"Ilia Malinin was the first to land a quad Axel in ISU competition.",a:true,e:"Malinin landed the first quad Axel at the 2022 US International Classic. As of 2026 he remains the only skater to have done so.",c:"World Record"},
+  {s:"Multiple skaters have landed the quad Axel in ISU competition.",a:false,e:"As of 2026, Malinin is the only skater to have successfully landed a quad Axel in competition.",c:"World Record"},
+  // PERSONAL BESTS — verified from skater data in this quiz
+  {s:"Ilia Malinin's personal best is higher than Yuma Kagiyama's.",a:true,e:"Malinin's PB is 333.81 vs Kagiyama's 306.67 — Malinin leads by over 27 points.",c:"Personal Best"},
+  {s:"Kaori Sakamoto's personal best is above 240 points.",a:false,e:"Sakamoto's PB is 238.28, just under 240.",c:"Personal Best"},
+  {s:"Papadakis and Cizeron's PB is above 225 points.",a:true,e:"Their PB is 229.82. Note: Chock and Bates now hold the ice dance world record at 232.32.",c:"Personal Best"},
+  {s:"Wenjing Sui and Cong Han's PB is higher than Madison Chock and Evan Bates's.",a:true,e:"Sui/Han's PB is 239.88 (pairs) vs Chock/Bates's 222.17 (ice dance). Different disciplines, but Sui/Han's number is higher.",c:"Personal Best"},
+  {s:"Shun Sato's PB is higher than Mikhail Shaidorov's.",a:true,e:"Sato's PB is 292.08 vs Shaidorov's 291.58 — just 0.50 apart.",c:"Personal Best"},
+  {s:"Loena Hendrickx's PB is above 210 points.",a:false,e:"Hendrickx's PB is 204.96, below 210.",c:"Personal Best"},
+  {s:"Jason Brown's PB is above 260 points.",a:false,e:"Brown's PB is 257.81, below 260. He is celebrated for artistry rather than technical difficulty.",c:"Personal Best"},
+  // SCORE COMPARISONS
+  {s:"The top ice dance PB in the dataset beats the top pairs PB.",a:false,e:"Top ice dance here: Papadakis/Cizeron 229.82. Top pairs: Sui/Han 239.88. Pairs wins.",c:"Score Comparison"},
+  {s:"The gap between Malinin's and Kagiyama's PBs exceeds 30 points.",a:false,e:"333.81 minus 306.67 = 27.14 points — less than 30.",c:"Score Comparison"},
+  {s:"Kao Miura's PB is within 1 point of Junhwan Cha's.",a:true,e:"Cha: 273.92, Miura: 273.73 — just 0.19 apart.",c:"Score Comparison"},
+  {s:"Boyang Jin's PB is higher than Jason Brown's.",a:true,e:"Jin: 258.86 vs Brown: 257.81.",c:"Score Comparison"},
+  // COUNTRY
+  {s:"Gabriella Papadakis and Guillaume Cizeron represent France.",a:true,e:"Papadakis and Cizeron are French and won the 2022 Olympic ice dance gold for France.",c:"Country"},
+  {s:"Jason Brown represents Canada.",a:false,e:"Brown competes for the United States.",c:"Country"},
+  {s:"Kevin Aymoz represents Switzerland.",a:false,e:"Aymoz skates for France. Lukas Britschgi is the Swiss men's singles skater.",c:"Country"},
+  {s:"Donovan Carrillo represents Mexico.",a:true,e:"Carrillo is Mexico's most prominent figure skater and competed at the 2022 Olympics.",c:"Country"},
+  {s:"Kaori Sakamoto represents Japan.",a:true,e:"Sakamoto is a four-time World Champion for Japan.",c:"Country"},
+  // DISCIPLINE
+  {s:"Madison Chock and Evan Bates are an ice dance team.",a:true,e:"Chock and Bates are an ice dance team and hold the current ice dance world record of 232.32.",c:"Discipline"},
+  {s:"Ice dance teams are permitted to perform throw jumps.",a:false,e:"Throw jumps belong to Pairs skating. Ice dance focuses on lifts, twizzles, footwork and dance elements.",c:"Discipline"},
+  {s:"Wenjing Sui and Cong Han compete in Pairs skating.",a:true,e:"They are China's top Pairs team, world record holders and 2022 Olympic gold medalists.",c:"Discipline"},
+  // RULES
+  {s:"A quad Axel has a higher base value than a quad Lutz.",a:true,e:"The quad Axel (4A) base value is 12.50. The quad Lutz (4Lz) is 11.50.",c:"Rules"},
+  {s:"A triple Axel requires 3.5 rotations in the air.",a:true,e:"The Axel's forward takeoff adds half a rotation — a triple Axel = 3.5 rotations.",c:"Rules"},
+  {s:"In ISU competition, the short program is always skated before the free skate.",a:true,e:"All ISU singles and pairs events: short program first, then free skate. The short program has 7 required elements.",c:"Rules"},
+].map(q=>({statement:q.s,answer:q.a,explanation:q.e,category:q.c}));}
+function initTF(){tfBank=buildTFBank();shuffleArr(tfBank);tfUsed=[];tfScoreVal=0;tfLives=3;tfLocked=false;document.getElementById('tfScore').textContent=0;renderLives();renderTFProgress();nextTF();}
+function renderLives(){const el=document.getElementById('tfLives');el.innerHTML='';for(let i=0;i<3;i++){const s=document.createElement('span');s.className='tf-life';s.textContent=i<tfLives?'❤️':'🖤';el.appendChild(s);}}
+function renderTFProgress(){const el=document.getElementById('tfProgress');el.innerHTML='';tfUsed.forEach(r=>{const d=document.createElement('div');d.className='tf-dot '+(r?'c':'w');el.appendChild(d);});}
+function nextTF(){if(!tfBank.length){tfBank=buildTFBank();shuffleArr(tfBank);}tfCurrent=tfBank.pop();tfLocked=false;document.getElementById('tfStatement').textContent=tfCurrent.statement;document.getElementById('tfCatPill').innerHTML=`<span class="cat-pill ${CAT_STYLES[tfCurrent.category]||'cat-rules'}">${tfCurrent.category}</span>`;document.getElementById('tfExplanation').style.display='none';document.getElementById('tfTrue').className='tf-btn true-btn';document.getElementById('tfFalse').className='tf-btn false-btn';}
+function answerTF(userAnswer){
+  if(tfLocked)return;tfLocked=true;const correct=userAnswer===tfCurrent.answer;
+  const tBtn=document.getElementById('tfTrue'),fBtn=document.getElementById('tfFalse'),expEl=document.getElementById('tfExplanation');
+  if(correct){(userAnswer?tBtn:fBtn).classList.add('correct');tfScoreVal++;document.getElementById('tfScore').textContent=tfScoreVal;flash('✓ +1');updateGlobal(true);tfUsed.push(true);}
+  else{(userAnswer?tBtn:fBtn).classList.add('wrong');(tfCurrent.answer?tBtn:fBtn).classList.add('correct');tfLives--;renderLives();flash('✗');updateGlobal(false);tfUsed.push(false);if(tfLives<=0){saveScore(tfScoreVal,'True/False');expEl.style.display='block';expEl.innerHTML='<b>Game over!</b> '+tfCurrent.explanation+'<br><br><button class="btn" style="margin-top:8px;padding:8px 16px;font-size:12px" onclick="initTF()">Play again</button>';renderTFProgress();return;}}
+  expEl.style.display='block';expEl.textContent=tfCurrent.explanation;renderTFProgress();okBtn(nextTF,'tfExplanation');
 }
  
-let podiumSkaters = [], podiumScore = 0, podiumLocked = false;
-function newPodium() { podiumLocked = false; podiumSkaters = pickDistinct(3); shuffleArr(podiumSkaters); document.getElementById('podiumMsg').style.display = 'none'; document.getElementById('podiumSubmit').style.display = 'block'; renderPodiumList(); }
-function renderPodiumList() {
-  const list = document.getElementById('podiumList'); list.innerHTML = '';
-  podiumSkaters.forEach((s, i) => {
-    const item = document.createElement('div'); item.className = 'podium-item'; item.draggable = true; item.dataset.idx = i;
-    item.innerHTML = `<div class="podium-pos">${i + 1}</div><div class="podium-name">${s[0]}<br><span style="font-size:11px;color:#888">${DISCS[s[3]]} · ${s[2]}</span></div><div class="podium-score">???</div>`;
-    item.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', i); item.classList.add('dragging'); });
-    item.addEventListener('dragend', () => item.classList.remove('dragging'));
-    item.addEventListener('dragover', e => { e.preventDefault(); item.classList.add('drag-over'); });
-    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
-    item.addEventListener('drop', e => { e.preventDefault(); item.classList.remove('drag-over'); const from = +e.dataTransfer.getData('text/plain'); const to = +item.dataset.idx; if (from === to) return; const tmp = podiumSkaters[from]; podiumSkaters[from] = podiumSkaters[to]; podiumSkaters[to] = tmp; renderPodiumList(); });
+// HIGHER OR LOWER
+let hlLeft,hlRight,hlStreak=0,hlLocked=false;
+function newHL(){
+  hlLocked=false;hideExp('hlExp');[hlLeft,hlRight]=pickDistinct(2);
+  document.getElementById('hlLeftName').textContent=hlLeft[0];document.getElementById('hlLeftDisc').innerHTML=discBadge(hlLeft[3]);document.getElementById('hlLeftScore').textContent=hlLeft[1];
+  document.getElementById('hlRightName').textContent=hlRight[0];document.getElementById('hlRightDisc').innerHTML=discBadge(hlRight[3]);document.getElementById('hlRightScore').textContent='???';document.getElementById('hlRightScore').className='hl-score hidden';
+  document.getElementById('hlLeft').className='hl-card';document.getElementById('hlRight').className='hl-card';
+  document.getElementById('hlHigherBtn').className='hl-btn higher';document.getElementById('hlLowerBtn').className='hl-btn lower';
+}
+function answerHL(guess){
+  if(hlLocked)return;hlLocked=true;const correct=(guess==='higher'&&hlRight[1]>hlLeft[1])||(guess==='lower'&&hlRight[1]<hlLeft[1]);
+  document.getElementById('hlRightScore').textContent=hlRight[1];document.getElementById('hlRightScore').className='hl-score';
+  const rightCard=document.getElementById('hlRight'),chosenBtn=document.getElementById(guess==='higher'?'hlHigherBtn':'hlLowerBtn');
+  if(correct){rightCard.classList.add('correct');chosenBtn.classList.add('correct');hlStreak++;updateGlobal(true);document.getElementById('hlStreak').textContent=hlStreak;flash('✓ +1');}
+  else{rightCard.classList.add('wrong');chosenBtn.classList.add('wrong');saveScore(hlStreak,'Higher/Lower');hlStreak=0;document.getElementById('hlStreak').textContent=0;updateGlobal(false);flash('✗');}
+  const diff=Math.abs(hlRight[1]-hlLeft[1]).toFixed(2);
+  const dir=hlRight[1]>hlLeft[1]?'higher':'lower';
+  showExp('hlExp',correct,hlRight[0]+' scored '+hlRight[1]+' — '+diff+' pts '+dir+' than '+hlLeft[0]+"'s "+hlLeft[1]+'. '+skaterFact(hlRight[0]));
+  okBtn(newHL,'hlExp');
+}
+ 
+// PODIUM
+let podiumSkaters=[],podiumScore=0,podiumLocked=false;
+function newPodium(){podiumLocked=false;hideExp('podiumExp');podiumSkaters=pickDistinct(3);shuffleArr(podiumSkaters);document.getElementById('podiumMsg').style.display='none';document.getElementById('podiumSubmit').style.display='block';renderPodiumList();}
+function renderPodiumList(){
+  const list=document.getElementById('podiumList');list.innerHTML='';
+  podiumSkaters.forEach((s,i)=>{
+    const item=document.createElement('div');item.className='podium-item';item.draggable=true;item.dataset.idx=i;
+    item.innerHTML=`<div class="podium-pos">${i+1}</div><div class="podium-name">${s[0]}<br><span style="font-size:11px;color:#888">${DISCS[s[3]]} · ${s[2]}</span></div><div class="podium-score">???</div>`;
+    item.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',i);item.classList.add('dragging');});
+    item.addEventListener('dragend',()=>item.classList.remove('dragging'));
+    item.addEventListener('dragover',e=>{e.preventDefault();item.classList.add('drag-over');});
+    item.addEventListener('dragleave',()=>item.classList.remove('drag-over'));
+    item.addEventListener('drop',e=>{e.preventDefault();item.classList.remove('drag-over');const from=+e.dataTransfer.getData('text/plain');const to=+item.dataset.idx;if(from===to)return;const tmp=podiumSkaters[from];podiumSkaters[from]=podiumSkaters[to];podiumSkaters[to]=tmp;renderPodiumList();});
     list.appendChild(item);
   });
 }
-function checkPodium() {
-  if (podiumLocked) return; podiumLocked = true; const sorted = [...podiumSkaters].sort((a, b) => b[1] - a[1]); const allCorrect = podiumSkaters.every((s, i) => s === sorted[i]);
-  document.querySelectorAll('.podium-item').forEach((item, i) => { item.querySelector('.podium-score').textContent = podiumSkaters[i][1]; item.classList.add(podiumSkaters[i] === sorted[i] ? 'correct' : 'wrong'); });
-  const m = document.getElementById('podiumMsg'); m.style.display = 'block'; document.getElementById('podiumSubmit').style.display = 'none';
-  if (allCorrect) { podiumScore += 3; flash('✓ +3'); m.textContent = 'Perfect! All 3 in the right order.'; updateGlobal(true); }
-  else { const got = podiumSkaters.filter((s, i) => s === sorted[i]).length; m.textContent = got + '/3 correct. Correct order: ' + sorted.map(s => s[0].split(' ')[0]).join(' > '); if (got > 0) { podiumScore += got; flash('~'); } else { saveScore(podiumScore, 'Podium'); podiumScore = 0; updateGlobal(false); flash('✗'); } }
-  document.getElementById('podiumScore').textContent = podiumScore; setTimeout(newPodium, 2200);
+function checkPodium(){
+  if(podiumLocked)return;podiumLocked=true;const sorted=[...podiumSkaters].sort((a,b)=>b[1]-a[1]);const allCorrect=podiumSkaters.every((s,i)=>s===sorted[i]);
+  document.querySelectorAll('.podium-item').forEach((item,i)=>{item.querySelector('.podium-score').textContent=podiumSkaters[i][1];item.classList.add(podiumSkaters[i]===sorted[i]?'correct':'wrong');});
+  const m=document.getElementById('podiumMsg');m.style.display='block';document.getElementById('podiumSubmit').style.display='none';
+  const got=podiumSkaters.filter((s,i)=>s===sorted[i]).length;
+  const correctOrder=sorted.map(s=>s[0].split(' ')[0]+' ('+s[1]+')').join(' > ');
+  if(allCorrect){podiumScore+=3;flash('✓ +3');m.textContent='Perfect order!';updateGlobal(true);}
+  else{m.textContent=got+'/3 correct.';if(got>0){podiumScore+=got;flash('~');}else{saveScore(podiumScore,'Podium');podiumScore=0;updateGlobal(false);flash('✗');}document.getElementById('podiumScore').textContent=podiumScore;}
+  document.getElementById('podiumScore').textContent=podiumScore;
+  showExp('podiumExp',allCorrect,'Correct order: '+correctOrder);okBtn(newPodium,'podiumExp');
 }
  
-let missingAns, missingDigit, missingPos, missingStreak = 0, missingLocked = false;
-function newMissing() {
-  missingLocked = false; missingAns = pick(allSkaters); const scoreStr = missingAns[1].toString();
-  const digits = scoreStr.replace('.', '').split('').filter(c => c >= '0' && c <= '9'); missingPos = Math.floor(Math.random() * digits.length); missingDigit = digits[missingPos];
-  let raw = scoreStr, blankCount = 0, display = '';
-  for (let i = 0; i < raw.length; i++) { if (raw[i] === '.') { display += '.'; continue; } if (blankCount === missingPos) { display += '<span class="blank">_</span>'; } else { display += raw[i]; } blankCount++; }
-  document.getElementById('missingName').textContent = missingAns[0]; document.getElementById('missingSub').innerHTML = missingAns[2] + ' · ' + discBadge(missingAns[3]); document.getElementById('missingDisplay').innerHTML = display; document.getElementById('missingMsg').style.display = 'none';
-  const grid = document.getElementById('digitGrid'); grid.innerHTML = '';
-  ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'].forEach(d => {
-    const b = document.createElement('button'); b.className = 'digit-btn'; b.textContent = d;
-    b.onclick = () => { if (missingLocked) return; missingLocked = true; grid.querySelectorAll('button').forEach(x => x.onclick = null); const m = document.getElementById('missingMsg'); m.style.display = 'block'; if (d === missingDigit) { b.classList.add('correct'); missingStreak++; updateGlobal(true); document.getElementById('missingStreak').textContent = missingStreak; flash('✓ +1'); m.textContent = 'Correct! Full score: ' + missingAns[1]; } else { b.classList.add('wrong'); grid.querySelectorAll('button').forEach(x => { if (x.textContent === missingDigit) x.classList.add('correct'); }); saveScore(missingStreak, 'Missing Score'); missingStreak = 0; document.getElementById('missingStreak').textContent = 0; updateGlobal(false); flash('✗'); m.textContent = 'Wrong! Missing digit: ' + missingDigit + '. Full score: ' + missingAns[1]; } setTimeout(newMissing, 1400); };
-    grid.appendChild(b);
+// MISSING SCORE
+let missingAns,missingDigit,missingPos,missingStreak=0,missingLocked=false;
+function newMissing(){
+  missingLocked=false;missingAns=pick(allSkaters);const scoreStr=missingAns[1].toString();
+  const digits=scoreStr.replace('.','').split('').filter(c=>c>='0'&&c<='9');missingPos=Math.floor(Math.random()*digits.length);missingDigit=digits[missingPos];
+  let raw=scoreStr,blankCount=0,display='';
+  for(let i=0;i<raw.length;i++){if(raw[i]==='.'){display+='.';continue;}if(blankCount===missingPos){display+='<span class="blank">_</span>';}else{display+=raw[i];}blankCount++;}
+  document.getElementById('missingName').textContent=missingAns[0];document.getElementById('missingSub').innerHTML=missingAns[2]+' · '+discBadge(missingAns[3]);document.getElementById('missingDisplay').innerHTML=display;document.getElementById('missingMsg').style.display='none';
+  const grid=document.getElementById('digitGrid');grid.innerHTML='';
+  ['0','1','2','3','4','5','6','7','8','9'].forEach(d=>{
+    const b=document.createElement('button');b.className='digit-btn';b.textContent=d;
+    b.onclick=()=>{
+      if(missingLocked)return;missingLocked=true;grid.querySelectorAll('button').forEach(x=>x.onclick=null);
+      const correct=d===missingDigit;
+      const m=document.getElementById('missingMsg');m.style.display='block';
+      if(correct){b.classList.add('correct');missingStreak++;updateGlobal(true);document.getElementById('missingStreak').textContent=missingStreak;flash('✓ +1');m.textContent='Correct! Full score: '+missingAns[1];}
+      else{b.classList.add('wrong');grid.querySelectorAll('button').forEach(x=>{if(x.textContent===missingDigit)x.classList.add('correct');});saveScore(missingStreak,'Missing Score');missingStreak=0;document.getElementById('missingStreak').textContent=0;updateGlobal(false);flash('✗');m.textContent='Wrong! Missing digit was '+missingDigit+'. Full score: '+missingAns[1];}
+      // Show skater fact in the result msg
+      m.textContent+=' — '+skaterFact(missingAns[0]);
+      okBtn(newMissing,'missingMsg');
+    };grid.appendChild(b);
   });
 }
  
-let speedScore = 0, speedWrong = 0, speedLocked = false;
-const speedQTypes = ['pb', 'country', 'discipline'];
-function startSpeed() { speedScore = 0; speedWrong = 0; document.getElementById('speedScore').textContent = 0; document.getElementById('speedWrong').textContent = '0 wrong'; newSpeed(); }
-function newSpeed() {
-  speedLocked = false; const type = speedQTypes[Math.floor(Math.random() * speedQTypes.length)]; const ans = pick(allSkaters); let q, opts, correct;
-  if (type === 'pb') { q = "What is " + ans[0] + "'s personal best score?"; correct = ans[1].toString(); opts = rand4(ans, allSkaters).map(s => s[1].toString()); document.getElementById('speedLabel').textContent = 'Personal Best'; }
-  else if (type === 'country') { q = "Which country does " + ans[0] + " represent?"; correct = ans[2]; const countries = [...new Set(allSkaters.map(s => s[2]))]; opts = [ans[2]]; while (opts.length < 4) { let r = countries[Math.random() * countries.length | 0]; if (!opts.includes(r)) opts.push(r); } opts.sort(() => Math.random() - 0.5); document.getElementById('speedLabel').textContent = 'Country'; }
-  else { q = "What discipline does " + ans[0] + " compete in?"; correct = DISCS[ans[3]]; opts = [...new Set(allSkaters.map(s => DISCS[s[3]]))].sort(() => Math.random() - 0.5); if (!opts.includes(correct)) opts[0] = correct; opts = opts.slice(0, 4); document.getElementById('speedLabel').textContent = 'Discipline'; }
-  document.getElementById('speedQ').textContent = q; const box = document.getElementById('speedChoices'); box.innerHTML = ''; const r = document.getElementById('speedResult'); r.style.display = 'none';
-  opts.forEach(o => {
-    const b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = o;
-    b.onclick = () => { if (speedLocked) return; speedLocked = true; box.querySelectorAll('button').forEach(x => x.onclick = null); if (o === correct) { b.classList.add('correct'); speedScore++; document.getElementById('speedScore').textContent = speedScore; updateGlobal(true); flash('⚡'); r.className = 'speed-result ok'; r.style.display = 'block'; r.textContent = 'Correct!'; } else { b.classList.add('wrong'); box.querySelectorAll('button').forEach(x => { if (x.textContent === correct) x.classList.add('correct'); }); speedWrong++; document.getElementById('speedWrong').textContent = speedWrong + ' wrong'; if (speedWrong >= 3) { saveScore(speedScore, 'Speed Round'); r.className = 'speed-result bad'; r.style.display = 'block'; r.textContent = '3 wrong — game over! Score: ' + speedScore + '. Hit New game to retry.'; updateGlobal(false); flash('✗'); return; } updateGlobal(false); flash('✗'); r.className = 'speed-result bad'; r.style.display = 'block'; r.textContent = 'Wrong! Answer: ' + correct; } setTimeout(newSpeed, 900); };
-    box.appendChild(b);
+// SPEED ROUND
+let speedScore=0,speedWrong=0,speedLocked=false,speedCurrent=null;
+const speedQTypes=['pb','country','discipline'];
+function startSpeed(){speedScore=0;speedWrong=0;document.getElementById('speedScore').textContent=0;document.getElementById('speedWrong').textContent='0 wrong';newSpeed();}
+function newSpeed(){
+  speedLocked=false;const type=speedQTypes[Math.floor(Math.random()*speedQTypes.length)];const ans=pick(allSkaters);speedCurrent=ans;let q,opts,correct;
+  if(type==='pb'){q="What is "+ans[0]+"'s personal best score?";correct=ans[1].toString();opts=rand4(ans,allSkaters).map(s=>s[1].toString());document.getElementById('speedLabel').textContent='Personal Best';}
+  else if(type==='country'){q="Which country does "+ans[0]+" represent?";correct=ans[2];const countries=[...new Set(allSkaters.map(s=>s[2]))];opts=[ans[2]];while(opts.length<4){let r=countries[Math.random()*countries.length|0];if(!opts.includes(r))opts.push(r);}opts.sort(()=>Math.random()-0.5);document.getElementById('speedLabel').textContent='Country';}
+  else{q="What discipline does "+ans[0]+" compete in?";correct=DISCS[ans[3]];opts=[...new Set(allSkaters.map(s=>DISCS[s[3]]))].sort(()=>Math.random()-0.5);if(!opts.includes(correct))opts[0]=correct;opts=opts.slice(0,4);document.getElementById('speedLabel').textContent='Discipline';}
+  document.getElementById('speedQ').textContent=q;const box=document.getElementById('speedChoices');box.innerHTML='';const r=document.getElementById('speedResult');r.style.display='none';
+  opts.forEach(o=>{const b=document.createElement('button');b.className='choice-btn';b.textContent=o;
+    b.onclick=()=>{
+      if(speedLocked)return;speedLocked=true;box.querySelectorAll('button').forEach(x=>x.onclick=null);
+      const isCorrect=o===correct;
+      if(isCorrect){b.classList.add('correct');speedScore++;document.getElementById('speedScore').textContent=speedScore;updateGlobal(true);flash('⚡');r.className='speed-result ok';r.style.display='block';r.textContent='✓ '+skaterFact(speedCurrent[0]);}
+      else{b.classList.add('wrong');box.querySelectorAll('button').forEach(x=>{if(x.textContent===correct)x.classList.add('correct');});speedWrong++;document.getElementById('speedWrong').textContent=speedWrong+' wrong';
+        r.className='speed-result bad';r.style.display='block';
+        if(speedWrong>=3){saveScore(speedScore,'Speed Round');r.textContent='Game over! Answer was: '+correct+'. '+skaterFact(speedCurrent[0]);updateGlobal(false);flash('✗');return;}
+        updateGlobal(false);flash('✗');r.textContent='✗ Answer: '+correct+'. '+skaterFact(speedCurrent[0]);}
+      okBtn(newSpeed,'speedResult');
+    };box.appendChild(b);});
+}
+ 
+// CAREER QUIZ
+const careerQuestions=[
+  {q:"Which skater won the men's singles gold medal at the 2022 Beijing Olympics?",opts:["Nathan Chen","Yuma Kagiyama","Shoma Uno","Vincent Zhou"],ans:"Nathan Chen",exp:"Nathan Chen (USA) won gold at Beijing 2022. Kagiyama won silver and Uno won bronze."},
+  {q:"How many World Championship titles did Kaori Sakamoto win in her career?",opts:["2","3","4","5"],ans:"4",exp:"Sakamoto won four World titles: 2022, 2023, 2024, and 2026 — ending her career as one of the most decorated women's skaters ever."},
+  {q:"Which skater was the first to land a quad Axel in ISU competition?",opts:["Yuzuru Hanyu","Nathan Chen","Ilia Malinin","Shoma Uno"],ans:"Ilia Malinin",exp:"Malinin landed the first quad Axel at the 2022 US International Classic, making history as a teenager."},
+  {q:"At which Olympic Games did Papadakis and Cizeron win ice dance gold?",opts:["Sochi 2014","PyeongChang 2018","Beijing 2022","Milan 2026"],ans:"Beijing 2022",exp:"They won gold at Beijing 2022 after winning silver at PyeongChang 2018, where Tessa Virtue and Scott Moir took gold."},
+  {q:"Yuzuru Hanyu won back-to-back Olympic gold medals in which years?",opts:["2010 & 2014","2014 & 2018","2018 & 2022","2006 & 2010"],ans:"2014 & 2018",exp:"Hanyu won gold at Sochi 2014 and PyeongChang 2018, the first man to go back-to-back since Dick Button in 1948/1952."},
+  {q:"Which country do Wenjing Sui and Cong Han represent?",opts:["Japan","South Korea","China","Russia"],ans:"China",exp:"Sui and Han are China's premier pairs team, two-time World Champions and 2022 Olympic gold medalists."},
+  {q:"Jason Brown is known for competing at the elite level without regularly including what?",opts:["Lutz jump","Quad jumps","Axel jump","Combination spins"],ans:"Quad jumps",exp:"Brown built his career on exceptional skating skills and artistry without relying on quad jumps, making him unusual among top men."},
+  {q:"Loena Hendrickx represents which country?",opts:["Netherlands","France","Belgium","Germany"],ans:"Belgium",exp:"Hendrickx is Belgium's top women's singles skater and 2022 World Championship silver medalist."},
+  {q:"Which pair won the pairs gold medal at the 2022 Beijing Olympics?",opts:["Sui / Han","Mishina / Galliamov","Knierim / Frazier","Tarasova / Morozov"],ans:"Sui / Han",exp:"Wenjing Sui and Cong Han won pairs gold at Beijing 2022 with a world record total of 239.88."},
+  {q:"Madison Chock and Evan Bates compete in which figure skating discipline?",opts:["Pairs","Ice Dance","Synchronized","Men's Singles"],ans:"Ice Dance",exp:"Chock and Bates are an ice dance team who competed at multiple Olympic Games including Beijing 2022."},
+  {q:"Who won the women's singles gold at the 2022 Beijing Olympics?",opts:["Kamila Valieva","Evgenia Medvedeva","Anna Shcherbakova","Alexandra Trusova"],ans:"Anna Shcherbakova",exp:"Shcherbakova (ROC) won gold at Beijing 2022. Trusova won silver and Kaori Sakamoto won bronze."},
+  {q:"Who won the women's singles gold at the 2018 PyeongChang Olympics?",opts:["Evgenia Medvedeva","Alina Zagitova","Kaetlyn Osmond","Satoko Miyahara"],ans:"Alina Zagitova",exp:"Zagitova (OAR) won gold at PyeongChang 2018, edging her training partner Medvedeva by just 1.31 points. Osmond won bronze."},
+  {q:"Ilia Malinin competes for which country?",opts:["Russia","Kazakhstan","USA","Canada"],ans:"USA",exp:"Malinin competes for the United States Figure Skating federation."},
+  {q:"Which skater is renowned for their powerful quad Lutz as a signature jump?",opts:["Jason Brown","Boyang Jin","Tomoki Hiwatashi","Roman Sadovsky"],ans:"Boyang Jin",exp:"Jin was one of the first men to include the quad Lutz regularly in competition."},
+  {q:"The ISU Grand Prix Final typically takes place in which month?",opts:["August","October","December","March"],ans:"December",exp:"The Grand Prix Final takes place in December, concluding the series of six qualifying events."},
+  {q:"Which discipline involves throw jumps and side-by-side spins?",opts:["Ice Dance","Synchronized Skating","Pairs","Solo Singles"],ans:"Pairs",exp:"Pairs skating features throw jumps, overhead lifts, and side-by-side elements. Ice dance does not include these."},
+  {q:"Donovan Carrillo is one of the few Mexican skaters to have qualified for which event?",opts:["World Championships","Four Continents","Olympic Games","Grand Prix Final"],ans:"Olympic Games",exp:"Carrillo qualified for the 2022 Beijing Olympics, one of very few Mexican skaters ever to compete at the Winter Games."},
+  {q:"In ISU scoring, what does 'GOE' stand for?",opts:["Grade of Execution","Goal of Element","General Overall Evaluation","Grade of Excellence"],ans:"Grade of Execution",exp:"GOE ranges from -5 to +5 and is added to each element's base value based on quality of execution."},
+  {q:"Yuzuru Hanyu first broke 300 points total score at which event?",opts:["2013 Grand Prix Final","2014 Sochi Olympics","2015 NHK Trophy","2016 World Championships"],ans:"2015 NHK Trophy",exp:"Hanyu scored 322.40 at the 2015 NHK Trophy in Nagano, the first skater in history to break 300 points."},
+  {q:"Piper Gilles and Paul Poirier represent which country in ice dance?",opts:["USA","Canada","France","Great Britain"],ans:"Canada",exp:"Gilles and Poirier are a Canadian ice dance team known for their creative programs."},
+  {q:"How many jumping passes are required in the senior singles short program?",opts:["1","2","3","4"],ans:"3",exp:"The senior singles short program requires exactly 3 jumping passes: one Axel-type jump (double or triple Axel), one solo jump, and one jump combination — all different jump types."},
+  {q:"Which of these is a spin, NOT a jump in figure skating?",opts:["Salchow","Lutz","Biellmann","Flip"],ans:"Biellmann",exp:"The Biellmann is a spin where the skater holds one blade above their head. The six competition jumps are: Axel, Salchow, Loop, Flip, Lutz, and Toe loop."},
+  {q:"Anastasia Mishina and Aleksandr Galliamov won the 2021 World Championship in which discipline?",opts:["Ice Dance","Women's Singles","Pairs","Men's Singles"],ans:"Pairs",exp:"Mishina and Galliamov won the 2021 World Championship in pairs skating, representing Russia."},
+  {q:"Yuzuru Hanyu's famous free skate program 'Seimei' was choreographed to music from which Japanese tradition?",opts:["Kabuki theatre","Taiko drumming","Onmyōji (The Yin-Yang Master)","Noh theatre"],ans:"Onmyōji (The Yin-Yang Master)",exp:"Hanyu's Seimei program was set to the soundtrack of the Onmyōji films by Shigeru Umebayashi. He debuted it in the 2015-16 season and used it to win the 2016 World Championships in Boston and again at the 2018 Olympics."},
+  {q:"Kaori Sakamoto won three consecutive World titles — matching whose record from 1966–68?",opts:["Dorothy Hamill","Peggy Fleming","Michelle Kwan","Janet Lynn"],ans:"Peggy Fleming",exp:"Sakamoto's three consecutive World titles (2022–2024) matched Peggy Fleming's feat from 1966–1968, a gap of 56 years."},
+];
+ 
+let careerBank=[],careerScore_=0,careerLives_=3,careerLocked=false,careerUsed=[],careerInited=false;
+function newCareer(){
+  if(!careerInited){careerBank=[...careerQuestions];shuffleArr(careerBank);careerScore_=0;careerLives_=3;careerUsed=[];careerLocked=false;careerInited=true;document.getElementById('careerScore').textContent=0;renderCareerLives();renderCareerProgress();}
+  if(!careerBank.length){careerBank=[...careerQuestions];shuffleArr(careerBank);}
+  const q=careerBank.pop();careerLocked=false;
+  document.getElementById('careerLabel').textContent='Career Question';
+  document.getElementById('careerQ').textContent=q.q;
+  document.getElementById('careerResult').style.display='none';
+  const opts=[...q.opts];shuffleArr(opts);
+  const box=document.getElementById('careerChoices');box.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');b.className='choice-btn';b.textContent=o;
+    b.onclick=()=>{
+      if(careerLocked)return;careerLocked=true;box.querySelectorAll('button').forEach(x=>x.onclick=null);
+      const res=document.getElementById('careerResult');res.style.display='block';
+      const isCorrect=o===q.ans;
+      if(isCorrect){
+        b.classList.add('correct');careerScore_++;document.getElementById('careerScore').textContent=careerScore_;flash('✓ +1');updateGlobal(true);careerUsed.push(true);
+        res.style.background='#e8f5e9';res.style.color='#1b5e20';res.textContent='✓ Correct! '+q.exp;
+        renderCareerProgress();okBtn(newCareer,'careerResult');
+      }else{
+        b.classList.add('wrong');box.querySelectorAll('button').forEach(x=>{if(x.textContent===q.ans)x.classList.add('correct');});
+        careerLives_--;renderCareerLives();flash('✗');updateGlobal(false);careerUsed.push(false);
+        res.style.background='#ffebee';res.style.color='#c62828';
+        renderCareerProgress();
+        if(careerLives_<=0){saveScore(careerScore_,'Career Quiz');res.innerHTML='<b>Game over!</b> '+q.exp+'<br><br><button class="btn" style="margin-top:8px;padding:8px 16px;font-size:12px" onclick="careerInited=false;newCareer()">Play again</button>';return;}
+        res.textContent='✗ Wrong! '+q.exp;
+        okBtn(newCareer,'careerResult');
+      }
+    };box.appendChild(b);
   });
 }
+function renderCareerLives(){const el=document.getElementById('careerLives');el.innerHTML='';for(let i=0;i<3;i++){const s=document.createElement('span');s.className='tf-life';s.textContent=i<careerLives_?'❤️':'🖤';el.appendChild(s);}}
+function renderCareerProgress(){const el=document.getElementById('careerProgress');el.innerHTML='';careerUsed.forEach(r=>{const d=document.createElement('div');d.className='tf-dot '+(r?'c':'w');el.appendChild(d);});}
  
 renderProfileGrid();
-const _p = loadProfiles(); if (_p.length === 1) loginAs(_p[0].name);
+const _p=loadProfiles();if(_p.length===1)loginAs(_p[0].name);
 </script>
 </body>
 </html>
